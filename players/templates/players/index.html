@@ -1,0 +1,207 @@
+<html>
+<head>
+<title>Cortex Roller</title>
+
+<!-- TODO supposedly i'm using an insecure method to serve my static files-->
+
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
+<link rel='stylesheet' type='text/css' href="{% static 'players/style.css' %}" />
+<script src="{% static 'players/jquery-3.3.1.min.js' %}"></script>
+<script>
+	(function poll(){
+		ajax_command('poll', 0);
+		setTimeout(function(){
+			poll();
+		}, 5000);
+	})();
+
+	$(function() {
+		$('#message-form').on('submit', function(event) {
+			event.preventDefault();
+			ajax_command('message', $('#message-text').val());
+			$('#message-text').val('');
+		});
+
+		$('#d4-add').click(function() {
+			ajax_command('adddie', 4);
+		});
+
+		$('#d6-add').click(function() {
+			ajax_command('adddie', 6);
+		});
+
+		$('#d8-add').click(function() {
+			ajax_command('adddie', 8);
+		});
+
+		$('#d10-add').click(function() {
+			ajax_command('adddie', 10);
+		});
+
+		$('#d12-add').click(function() {
+			ajax_command('adddie', 12);
+		});
+
+		$('#roll-all').click(function() {
+			ajax_command('roll', 0);
+		});
+
+		$('#remove-all').click(function() {
+			ajax_command('delall', 0);
+		});
+
+		$('#remove-some').click(function() {
+			ajax_command('deldice', 0);
+		});
+
+		$("#keep-dice").click(function() {
+			ajax_command('keep', 0);
+		});
+
+		$("#total-some").click(function() {
+			ajax_command('totaldice', 0);
+		});
+
+		$("#effect-some").click(function() {
+			ajax_command("effectdice", 0);
+		});
+
+		$("#clear-history").click(function() {
+			ajax_command("clearhistory", 0);
+		});
+
+		$("#step-up").click(function() {
+			ajax_command("updice", 0);
+		});
+
+		$("#step-down").click(function() {
+			ajax_command("downdice", 0);
+		});
+
+		$(document).on('click', '.dice-box', function() {
+			ajax_command('toggledie', $( this ).attr('id'));
+		});
+
+		$(document).on('dblclick', '.message-class', function() {
+			$('#message-text').val( $( this ).text() );
+			ajax_command('delmessage', $( this ).attr('id'));
+		});
+	});
+
+	function ajax_command(in_command, in_param) {
+		$.ajax({
+			url : 'ajax/',
+			type : 'post',
+			data : {
+				command : in_command,
+				param : in_param,
+				csrfmiddlewaretoken : '{{ csrf_token }}'
+			},
+			dataType : 'json',
+
+			success : function(json) {
+				$('#dice-row').empty();
+				for (var i = 0; i < json.dice_list.length; i++) {
+					var uuid = json.dice_list[i].uuid;
+					var faces = json.dice_list[i].faces;
+					var result = json.dice_list[i].result;
+					if (result == 0) {
+						result = '-';
+					}
+					var selectstyle = "dice-unselected";
+					if (json.dice_list[i].selected) {
+						selectstyle = "dice-selected";
+					}
+					var die_tag = '';
+					if (json.dice_list[i].tag == "T") {
+						die_tag = "Total";
+					} else if (json.dice_list[i].tag == "E") {
+						die_tag = "Effect";
+					}
+					// TODO stop the image from repeating and tiling
+					$('#dice-row').append("<div id='" + uuid + "' class='dice-box dice-image" + faces + " " + selectstyle + "'>D" + faces + "<br><span style='font-size:xx-large'>" + result + "</span><br>" + die_tag + "</div>");
+				}
+				$('#message-table').empty();
+				for (var i = 0; i < json.message_list.length; i++) {
+					$('#message-table').append("<div id='" + json.message_list[i].uuid + "' class='message-class'>" + json.message_list[i].text + "</div>");
+				}
+				$("#roll").empty();
+				$("#roll").append(json.roll);
+				$("#past-rolls").empty();
+				for (var i = 0; i < json.roll_list.length; i++) {
+					$("#past-rolls").append(json.roll_list[i] + "<br/>");
+				}
+			},
+
+			error : function(xhr, errmsg, err) {
+				console.log("must be an ajax error")
+			}
+		});
+	}
+
+</script>
+
+</head>
+<body>
+
+<div class="big-box">
+
+<div class='block-header'>Dice Pool</div>
+
+<div class="button-row">
+<div class="button-group">
+Add:
+<button id='d4-add'>D4</button>
+<button id='d6-add'>D6</button>
+<button id='d8-add'>D8</button>
+<button id='d10-add'>D10</button>
+<button id='d12-add'>D12</button>
+</div>
+<div class="button-group">
+All:
+<button id='roll-all'>Roll</button>
+<button id='remove-all'>Remove</button>
+<button id='keep-dice'>Keep</button>
+</div>
+<div class="button-group">
+Selected:
+<button id='step-up'>Up</button>
+<button id='step-down'>Down</button>
+<button id='remove-some'>Remove</button>
+<button id='total-some'>Total</button>
+<button id='effect-some'>Effect</button>
+</div>
+</div>
+
+<div id='roll' class="roll"></div>
+
+<div class='dice-all'>
+<div class='dice-row' id='dice-row'>
+</div>
+</div>
+
+<div class='bottom-info'>
+
+<div class='roll-box'>
+<div class='block-header'>Past Rolls</div>
+<div id='past-rolls'></div>
+<button id="clear-history">Clear History</button>
+</div>
+
+<div class='message-box'>
+<div class='block-header'>Sticky Notes</div>
+<div id='message-table'>
+</div>
+<form action='message/' method='POST' id='message-form'>
+	{% csrf_token %}
+	<!-- this no longer needs to be a form -->
+	<input type='text' size='40' name='text' id='message-text'/>
+	<input type='submit' value='Post Note' />
+</form>
+</div>
+
+</div>
+
+</body>
+</html>

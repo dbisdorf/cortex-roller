@@ -1,0 +1,97 @@
+.big-box {
+	width: 900px;
+	margin: auto;
+}
+
+.block-header {
+	text-align: center;
+	font-size: large;
+	font-weight: bold;
+	color: white;
+	background: black;
+}
+
+.button-row {
+	display:table;
+}
+
+.button-group {
+	display: table-cell;
+	padding: 10px;
+}
+
+.dice-all {
+	display: table;
+	border-collapse: separate;
+	border-spacing: 5px;
+}
+
+.dice-box {
+	border: 1px solid #333;
+	text-align: center;
+	padding: 10px;
+	width: 50px;
+	display: table-cell;
+	background-size: contain;
+	background-repeat: no-repeat;
+}
+
+.dice-unselected {
+	background-color: white;
+}
+
+.dice-selected {
+	background-color: gray;
+}
+
+.roll {
+	text-align: center;
+	font-weight: bold;
+}
+
+.bottom-info {
+	display: table;
+	width: 100%;
+}
+
+.roll-box {
+	display: table-cell;
+	padding: 10px;
+	width: 50%;
+}
+
+.message-box {
+	display: table-cell;
+	padding: 10px;
+	width: 50%;
+}
+
+.message-class {
+	width: 300px;
+	border: 1px solid #333;
+	text-align: center;
+	padding: 10px;
+	margin: 5px;
+}
+
+
+.dice-image4 {
+	background-image: url('d4.png');
+}
+
+.dice-image6 {
+	background-image: url('d6.png');
+}
+
+.dice-image8 {
+	background-image: url('d8.png');
+}
+
+.dice-image10 {
+	background-image: url('d10.png');
+}
+
+.dice-image12 {
+	background-image: url('d12.png');
+}
+
