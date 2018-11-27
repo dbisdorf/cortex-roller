@@ -171,7 +171,7 @@ def ajax(request, room_name):
     response['message_list'] = message_text_list
 
     dice_list = Die.objects.filter(room=room_name).order_by('faces', 'timestamp')
-    dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'selected':d.selected, 'tag':d.tag} for d in dice_list]
+    dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'selected':d.selected, 'tag':d.tag, 'timestamp':d.timestamp} for d in dice_list]
     response['dice_list'] = dice_text_list
 
     roll_list = Roll.objects.filter(room=room_name).order_by('-timestamp')
