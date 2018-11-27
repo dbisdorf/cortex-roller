@@ -54,10 +54,16 @@
 	width: 100%;
 }
 
+.options-box {
+	display: table-cell;
+	padding: 10px;
+	width: 25%;
+}
+
 .roll-box {
 	display: table-cell;
 	padding: 10px;
-	width: 50%;
+	width: 25%;
 }
 
 .message-box {
@@ -74,6 +80,11 @@
 	margin: 5px;
 }
 
+.about-box {
+	border: 1px solid;
+	padding: 5px;
+	text-align: center;
+}
 
 .dice-image4 {
 	background-image: url('d4.png');

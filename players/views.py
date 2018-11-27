@@ -116,7 +116,8 @@ def ajax(request, room_name):
         dice_list = Die.objects.filter(room=room_name)
         for die in dice_list:
             if die.selected:
-                die.tag = 'T'
+                if die.result > 1:
+                    die.tag = 'T'
                 die.selected = False
             elif die.tag == 'T':
                 die.tag = 'X'
@@ -126,7 +127,8 @@ def ajax(request, room_name):
         dice_list = Die.objects.filter(room=room_name)
         for die in dice_list:
             if die.selected:
-                die.tag = 'E'
+                if die.result > 1:
+                    die.tag = 'E'
                 die.selected = False
             elif die.tag == 'E':
                 die.tag = 'X'

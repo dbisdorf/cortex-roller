@@ -9,6 +9,8 @@
 <link rel='stylesheet' type='text/css' href="{% static 'players/style.css' %}" />
 <script src="{% static 'players/jquery-3.3.1.min.js' %}"></script>
 <script>
+	var dice_list;
+
 	(function poll(){
 		ajax_command('poll', 0);
 		setTimeout(function(){
@@ -79,6 +81,10 @@
 			ajax_command("downdice", 0);
 		});
 
+		$("#sort-result").click(function() {
+			draw_dice();
+		});
+
 		$(document).on('click', '.dice-box', function() {
 			ajax_command('toggledie', $( this ).attr('id'));
 		});
@@ -101,27 +107,9 @@
 			dataType : 'json',
 
 			success : function(json) {
-				$('#dice-row').empty();
-				for (var i = 0; i < json.dice_list.length; i++) {
-					var uuid = json.dice_list[i].uuid;
-					var faces = json.dice_list[i].faces;
-					var result = json.dice_list[i].result;
-					if (result == 0) {
-						result = '-';
-					}
-					var selectstyle = "dice-unselected";
-					if (json.dice_list[i].selected) {
-						selectstyle = "dice-selected";
-					}
-					var die_tag = '';
-					if (json.dice_list[i].tag == "T") {
-						die_tag = "Total";
-					} else if (json.dice_list[i].tag == "E") {
-						die_tag = "Effect";
-					}
-					// TODO stop the image from repeating and tiling
-					$('#dice-row').append("<div id='" + uuid + "' class='dice-box dice-image" + faces + " " + selectstyle + "'>D" + faces + "<br><span style='font-size:xx-large'>" + result + "</span><br>" + die_tag + "</div>");
-				}
+				dice_list = json.dice_list;
+				draw_dice();
+
 				$('#message-table').empty();
 				for (var i = 0; i < json.message_list.length; i++) {
 					$('#message-table').append("<div id='" + json.message_list[i].uuid + "' class='message-class'>" + json.message_list[i].text + "</div>");
@@ -138,6 +126,55 @@
 				console.log("must be an ajax error")
 			}
 		});
+	}
+
+	function draw_dice() {
+		if ($("#sort-result").is(":checked")) {
+			dice_list.sort(function(a, b) {
+				if (a.result < b.result) {
+					return -1;
+				} else if (a.result > b.result) {
+					return 1;
+				} else if (a.faces < b.faces) {
+					return -1;
+				} else if (a.faces > b.faces) {
+					return 1;
+				} else {
+					return 0;
+				}
+			});
+		} else {
+			dice_list.sort(function(a, b) {
+				if (a.faces < b.faces) {
+					return -1;
+				} else if (a.faces > b.faces) {
+					return 1;
+				} else {
+					return 0;
+				}
+			});
+		}
+
+		$('#dice-row').empty();
+		for (var i = 0; i < dice_list.length; i++) {
+			var uuid = dice_list[i].uuid;
+			var faces = dice_list[i].faces;
+			var result = dice_list[i].result;
+			if (result == 0) {
+				result = '-';
+			}
+			var selectstyle = "dice-unselected";
+			if (dice_list[i].selected) {
+				selectstyle = "dice-selected";
+			}
+			var die_tag = '';
+			if (dice_list[i].tag == "T") {
+				die_tag = "Total";
+			} else if (dice_list[i].tag == "E") {
+				die_tag = "Effect";
+			}
+			$('#dice-row').append("<div id='" + uuid + "' class='dice-box dice-image" + faces + " " + selectstyle + "'>D" + faces + "<br><span style='font-size:xx-large'>" + result + "</span><br>" + die_tag + "</div>");
+		}
 	}
 
 </script>
@@ -183,6 +220,12 @@ Selected:
 
 <div class='bottom-info'>
 
+<div class="options-box">
+<div class="block-header">Options</div>
+<input type="checkbox" id="sort-result" name="sort-result">
+<label for="sort-result">Sort dice by result</label>
+</div>
+
 <div class='roll-box'>
 <div class='block-header'>Past Rolls</div>
 <div id='past-rolls'></div>
@@ -201,6 +244,10 @@ Selected:
 </form>
 </div>
 
+</div>
+
+<div class="about-box">
+Cortex RPG Die Roller v0.1 - About
 </div>
 
 </body>
