@@ -4,8 +4,6 @@ from django.http import JsonResponse
 import json
 import random
 
-#TODO any mechanism to cut down on accidental reassignment of the same room? like a history of room inactivity?
-
 WORDS = [
         'Attic',
         'Bauble',
@@ -44,7 +42,6 @@ def get_random_words(num_words):
     return ''.join(all)
 
 def evaluate_dice():
-    #TODO is it confusing to sort dice by faces? especially after you step up or down?
     total = 0
     effect = ''
     dice_list = Die.objects.order_by('faces', 'timestamp')
@@ -133,6 +130,35 @@ def ajax(request, room_name):
             elif die.tag == 'E':
                 die.tag = 'X'
             die.save()
+
+    if command == 'totalbest':
+        marked = 0
+        dice_list = Die.objects.filter(room=room_name).order_by('-result')
+        for die in dice_list:
+            if die.result > 1 and marked < 2 and die.tag != 'E':
+                die.tag = 'T'
+                marked += 1
+            elif die.tag == 'T':
+                die.tag = 'X'
+            die.save()
+
+    if command == 'effectbest':
+        marked = 0
+        dice_list = Die.objects.filter(room=room_name).order_by('-faces')
+        for die in dice_list:
+            if die.result > 1 and marked < 1 and die.tag != 'T':
+                die.tag = 'E'
+                marked += 1
+            elif die.tag == 'E':
+                die.tag = 'X'
+            die.save()
+
+    if command == 'tagnone':
+        dice_list = Die.objects.filter(room=room_name)
+        for die in dice_list:
+            if die.tag != 'X':
+                die.tag = 'X'
+                die.save()
 
     if command == 'keep':
         new_roll = Roll(room=room_name, text=evaluate_dice())

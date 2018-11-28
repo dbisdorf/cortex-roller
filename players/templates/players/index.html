@@ -2,8 +2,6 @@
 <head>
 <title>Cortex Roller</title>
 
-<!-- TODO supposedly i'm using an insecure method to serve my static files-->
-
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
 <link rel='stylesheet' type='text/css' href="{% static 'players/style.css' %}" />
@@ -71,6 +69,18 @@
 
 		$("#clear-history").click(function() {
 			ajax_command("clearhistory", 0);
+		});
+
+		$("#total-best").click(function() {
+			ajax_command("totalbest", 0);
+		});
+
+		$("#effect-best").click(function() {
+			ajax_command("effectbest", 0);
+		});
+
+		$("#tag-none").click(function() {
+			ajax_command("tagnone", 0);
 		});
 
 		$("#step-up").click(function() {
@@ -191,28 +201,39 @@
 <div class='block-header'>Dice Pool</div>
 
 <div class="button-row">
-<div class="button-group">
-Add:
-<button id='d4-add'>D4</button>
-<button id='d6-add'>D6</button>
-<button id='d8-add'>D8</button>
-<button id='d10-add'>D10</button>
-<button id='d12-add'>D12</button>
+	<div class="button-group">
+	Add:
+	<button id='d4-add'>D4</button>
+	<button id='d6-add'>D6</button>
+	<button id='d8-add'>D8</button>
+	<button id='d10-add'>D10</button>
+	<button id='d12-add'>D12</button>
+	</div>
+
+	<div class="button-group">
+	Selected:
+	<button id='step-up'>Up</button>
+	<button id='step-down'>Down</button>
+	<button id='remove-some'>Remove</button>
+	<button id='total-some'>Total</button>
+	<button id='effect-some'>Effect</button>
+	</div>
 </div>
-<div class="button-group">
-All:
-<button id='roll-all'>Roll</button>
-<button id='remove-all'>Remove</button>
-<button id='keep-dice'>Keep</button>
-</div>
-<div class="button-group">
-Selected:
-<button id='step-up'>Up</button>
-<button id='step-down'>Down</button>
-<button id='remove-some'>Remove</button>
-<button id='total-some'>Total</button>
-<button id='effect-some'>Effect</button>
-</div>
+
+<div class="button-row">
+	<div class="button-group">
+	Mark Best:
+	<button id="total-best">Total</button>
+	<button id="effect-best">Effect</button>
+	<button id="tag-none">None</button>
+	</div>
+
+	<div class="button-group">
+	All:
+	<button id='roll-all'>Roll</button>
+	<button id='remove-all'>Remove</button>
+	<button id='keep-dice'>Keep</button>
+	</div>
 </div>
 
 <div id='roll' class="roll"></div>
@@ -251,7 +272,7 @@ Selected:
 </div>
 
 <div class="about-box">
-Cortex RPG Die Roller v0.1 - Send this link to your other players! - 
+Cortex RPG Die Roller v0.1 - Send the address of this page to your other players! - 
 <a href="{% static 'players/about.html' %}" target="_blank">About</a>
 </div>
 

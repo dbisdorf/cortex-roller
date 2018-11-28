@@ -12,12 +12,14 @@
 }
 
 .button-row {
-	display:table;
+	display: table;
+	width: 100%;
 }
 
 .button-group {
 	display: table-cell;
-	padding: 10px;
+	padding: 5px;
+	width: 50%;
 }
 
 .dice-all {
