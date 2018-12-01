@@ -1,10 +1,14 @@
 from django.db import models
+from django.utils import timezone
 import random
 import uuid
 
-# Create your models here.
+class Room(models.Model):
+    name = models.CharField(primary_key=True, max_length=30)
+    timestamp = models.DateTimeField(default=timezone.now)
 
-# TODO: is there any way to initialize the random generator globally?
+    def __str__(self):
+        return '[{0}] {1}'.format(self.name, self.timestamp)
 
 class Die(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

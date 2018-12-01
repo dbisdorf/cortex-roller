@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, reverse
-from .models import Die, Message, Roll
+from django.utils import timezone
+from .models import Die, Message, Roll, Room
 from django.http import JsonResponse
 import json
 import random
+import datetime
 
 WORDS = [
         'Attic',
@@ -56,15 +58,37 @@ def evaluate_dice():
         effect = 'None'
     return 'Total: {0} - Effect: {1}'.format(total, effect)
 
+def update_room_time(room_name):
+    active_room = Room.objects.get(name=room_name)
+    active_room.timestamp = timezone.now()
+    active_room.save()
+
 # view functions
 
 def index(request, room_name=None):
     if not room_name:
-        return redirect(reverse('index') + get_random_words(3) + '/')
+        # purge old rooms
+        purge_time = timezone.now() - datetime.timedelta(days=30)
+        old_rooms = Room.objects.filter(timestamp__lt=purge_time)
+        for old_room in old_rooms:
+            Die.objects.filter(room=old_room.name).delete()
+            Message.objects.filter(room=old_room.name).delete()
+            Roll.objects.filter(room=old_room.name).delete()
+            old_room.delete()
+
+        # choose new room
+        room_chosen = False
+        while not room_chosen:
+            new_room_name = get_random_words(3)
+            existing_rooms = Room.objects.filter(name=new_room_name)
+            if not existing_rooms:
+                room_chosen = True
+
+        new_room = Room(name=new_room_name)
+        new_room.save()
+        return redirect(reverse('index') + new_room_name + '/')
 
     result_dice_list = Die.objects.all()
-
-    #TODO maybe no need to include the result dice list in the context
 
     context = {
             'result_dice_list': result_dice_list
@@ -75,9 +99,6 @@ def index(request, room_name=None):
 def ajax(request, room_name):
     command = request.POST.get('command', None)
     param = request.POST.get('param', None)
-
-    # TODO in theory I should throw an error for invalid commands
-    # TODO why do some of my mouse clicks not given an immediate result?
 
     if command == 'message':
         new_message_text = param
@@ -189,6 +210,8 @@ def ajax(request, room_name):
 
     if command == 'clearhistory':
         Roll.objects.filter(room=room_name).delete()
+
+    update_room_time(room_name)
 
     response = {}
 
