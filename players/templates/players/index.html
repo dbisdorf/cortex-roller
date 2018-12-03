@@ -95,7 +95,7 @@
 			draw_dice();
 		});
 
-		$(document).on('click', '.dice-box', function() {
+		$(document).on('click', '.dice-check', function() {
 			ajax_command('toggledie', $( this ).attr('id'));
 		});
 
@@ -175,11 +175,11 @@
 			var faces = dice_list[i].faces;
 			var result = dice_list[i].result;
 			if (result == 0) {
-				result = '-';
+				result = '&nbsp;';
 			}
-			var selectstyle = "dice-unselected";
+			var selected = "";
 			if (dice_list[i].selected) {
-				selectstyle = "dice-selected";
+				selected = "checked";
 			}
 			var die_tag = '';
 			if (dice_list[i].tag == "T") {
@@ -187,7 +187,7 @@
 			} else if (dice_list[i].tag == "E") {
 				die_tag = "Effect";
 			}
-			$('#dice-row').append("<div id='" + uuid + "' class='dice-box dice-image" + faces + " " + selectstyle + "'>D" + faces + "<br><span style='font-size:xx-large'>" + result + "</span><br>" + die_tag + "</div>");
+			$('#dice-row').append("<div class='dice-box dice-image" + faces + "'>D" + faces + "<br><span style='font-size:xx-large'>" + result + "</span><br>" + die_tag + "<input type='checkbox' class='dice-check' id='" + uuid + "' " + selected + "></input></div>");
 		}
 	}
 
@@ -264,7 +264,8 @@
 <form action='message/' method='POST' id='message-form'>
 	{% csrf_token %}
 	<!-- this no longer needs to be a form -->
-	<input type='text' size='40' name='text' id='message-text'/>
+	<label for="message-text">New Note:</label>
+	<input type='text' size='40' name='message-text' id='message-text'/>
 	<input type='submit' value='Post Note' />
 </form>
 </div>

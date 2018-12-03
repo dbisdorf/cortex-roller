@@ -31,11 +31,15 @@
 .dice-box {
 	border: 1px solid #333;
 	text-align: center;
-	padding: 10px;
-	width: 50px;
+	padding: 5px;
+	width: 70px;
 	display: table-cell;
 	background-size: contain;
 	background-repeat: no-repeat;
+}
+
+.dice-check {
+	float: right;
 }
 
 .dice-unselected {
