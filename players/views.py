@@ -43,10 +43,10 @@ def get_random_words(num_words):
         all.append(random.choice(WORDS))
     return ''.join(all)
 
-def evaluate_dice():
+def evaluate_dice(room_name):
     total = 0
     effect = ''
-    dice_list = Die.objects.order_by('faces', 'timestamp')
+    dice_list = Die.objects.filter(room=room_name).order_by('faces', 'timestamp')
     for die in dice_list:
         if die.tag == 'T':
             total = total + die.result
@@ -182,7 +182,7 @@ def ajax(request, room_name):
                 die.save()
 
     if command == 'keep':
-        new_roll = Roll(room=room_name, text=evaluate_dice())
+        new_roll = Roll(room=room_name, text=evaluate_dice(room_name))
         new_roll.save()
 
     if command == 'toggledie':
@@ -227,7 +227,7 @@ def ajax(request, room_name):
     roll_text_list = [r.text for r in roll_list]
     response['roll_list'] = roll_text_list
 
-    response['roll'] = evaluate_dice()
+    response['roll'] = evaluate_dice(room_name)
 
     return JsonResponse(response)
 
