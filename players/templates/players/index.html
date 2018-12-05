@@ -193,7 +193,7 @@
 	function draw_messages() {
 		$("#message-table").empty();
 		for (var i = 0; i < message_list.length; i++) {
-			$("#message-table").append("<div class='message-row'><div id='" + message_list[i].uuid + "' class='message-class'>" + message_list[i].text + "</div><div class='message-controls'><button id='del-" + message_list[i].uuid + "' class='del-message'>X</button></div></div>");
+			$("#message-table").append("<div class='message-row'><div id='" + message_list[i].uuid + "' class='message-class'>" + message_list[i].text + "</div><div class='message-controls'><button id='del-" + message_list[i].uuid + "' class='del-message'>Remove</button></div></div>");
 		}
 	}
 

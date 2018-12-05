@@ -89,12 +89,13 @@
 	border: 1px solid #333;
 	text-align: center;
 	padding: 10px;
-	margin: 5px;
 }
 
-.del-message {
+.message-controls {
 	display: table-cell;
+	padding: 5px;
 }
+
 
 .about-box {
 	border: 1px solid;
