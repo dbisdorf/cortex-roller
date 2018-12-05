@@ -8,6 +8,9 @@
 <script src="{% static 'players/jquery-3.3.1.min.js' %}"></script>
 <script>
 	var dice_list;
+	var message_list;
+	var roll_list;
+	var recent_roll;
 
 	(function poll(){
 		ajax_command('poll', 0);
@@ -95,13 +98,14 @@
 			draw_dice();
 		});
 
-		$(document).on('click', '.dice-check', function() {
-			ajax_command('toggledie', $( this ).attr('id'));
+		$(document).on("click", ".dice-check", function() {
+			ajax_command("toggledie", $( this ).attr('id'));
 		});
 
-		$(document).on('dblclick', '.message-class', function() {
-			$('#message-text').val( $( this ).text() );
-			ajax_command('delmessage', $( this ).attr('id'));
+		$(document).on("click", ".del-message", function() {
+			var message_id = $( this ).attr("id").substring(4);
+			$("#message-text").val( $("#" + message_id).text() );
+			ajax_command("delmessage", message_id);
 		});
 	});
 
@@ -118,18 +122,13 @@
 
 			success : function(json) {
 				dice_list = json.dice_list;
+				message_list = json.message_list;
+				recent_roll = json.roll;
+				roll_list = json.roll_list;
 				draw_dice();
+				draw_messages();
+				draw_rolls();
 
-				$('#message-table').empty();
-				for (var i = 0; i < json.message_list.length; i++) {
-					$('#message-table').append("<div id='" + json.message_list[i].uuid + "' class='message-class'>" + json.message_list[i].text + "</div>");
-				}
-				$("#roll").empty();
-				$("#roll").append(json.roll);
-				$("#past-rolls").empty();
-				for (var i = 0; i < json.roll_list.length; i++) {
-					$("#past-rolls").append(json.roll_list[i] + "<br/>");
-				}
 			},
 
 			error : function(xhr, errmsg, err) {
@@ -188,6 +187,22 @@
 				die_tag = "Effect";
 			}
 			$('#dice-row').append("<div class='dice-box dice-image" + faces + "'>D" + faces + "<br><span style='font-size:xx-large'>" + result + "</span><br>" + die_tag + "<input type='checkbox' class='dice-check' id='" + uuid + "' " + selected + "></input></div>");
+		}
+	}
+
+	function draw_messages() {
+		$("#message-table").empty();
+		for (var i = 0; i < message_list.length; i++) {
+			$("#message-table").append("<div class='message-row'><div id='" + message_list[i].uuid + "' class='message-class'>" + message_list[i].text + "</div><div class='message-controls'><button id='del-" + message_list[i].uuid + "' class='del-message'>X</button></div></div>");
+		}
+	}
+
+	function draw_rolls() {
+		$("#roll").empty();
+		$("#roll").append(recent_roll);
+		$("#past-rolls").empty();
+		for (var i = 0; i < roll_list.length; i++) {
+			$("#past-rolls").append(roll_list[i] + "<br/>");
 		}
 	}
 

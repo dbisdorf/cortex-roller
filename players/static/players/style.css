@@ -78,12 +78,22 @@
 	width: 50%;
 }
 
+.message-row {
+	display: table;
+	padding: 5px;
+}
+
 .message-class {
+	display: table-cell;
 	width: 300px;
 	border: 1px solid #333;
 	text-align: center;
 	padding: 10px;
 	margin: 5px;
+}
+
+.del-message {
+	display: table-cell;
 }
 
 .about-box {
