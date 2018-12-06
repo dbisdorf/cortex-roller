@@ -7,32 +7,32 @@ import random
 import datetime
 
 WORDS = [
-        'Attic',
-        'Bauble',
-        'Cavort',
-        'Douse',
-        'Expel',
-        'Flinch',
-        'Grant',
-        'Heckle',
-        'Import',
-        'Jockey',
-        'Karma',
-        'Listen',
-        'Maple',
-        'Needy',
-        'Often',
-        'Penny',
-        'Quite',
-        'Rubric',
-        'Salvo',
-        'Teach',
-        'Union',
-        'Verse',
-        'Waltz',
-        'Xerox',
-        'Yokel',
-        'Zilch'
+        'Adapt', 'Attic', 'Alarm',
+        'Badge', 'Bauble', 'Breath',
+        'Cavort', 'Clean', 'Craft',
+        'Dally', 'Defer', 'Douse',
+        'Eager', 'Edify', 'Expel',
+        'Faint', 'Flinch', 'Forgot',
+        'Gander', 'Ghost', 'Grant',
+        'Habit', 'Heckle', 'Hound',
+        'Ideal', 'Import', 'Issue',
+        'Jewel', 'Jockey', 'Judge',
+        'Karma', 'Kiosk', 'Knock',
+        'Lagoon', 'Listen', 'Logic',
+        'Maple', 'Medal', 'Mirth',
+        'Nature', 'Needy', 'North',
+        'Octave', 'Often', 'Optic',
+        'Packet', 'Penny', 'Pledge',
+        'Quack', 'Quest', 'Quite',
+        'Radio', 'Remedy', 'Rubric',
+        'Salvo', 'Scold', 'Sharp',
+        'Tacit', 'Teach', 'Today',
+        'Ultra', 'Union', 'Urban',
+        'Vague', 'Verse', 'Vigil',
+        'Waist', 'Waltz', 'Whirl',
+        'Xenon', 'Xerox',
+        'Yield', 'Yokel', 'Youth',
+        'Zebra', 'Zilch', 'Zinc'
 ]
 
 # utility functions
@@ -46,7 +46,7 @@ def get_random_words(num_words):
 def evaluate_dice(room_name):
     total = 0
     effect = ''
-    dice_list = Die.objects.filter(room=room_name).order_by('faces', 'timestamp')
+    dice_list = Die.objects.filter(room=room_name).order_by('faces', 'created')
     for die in dice_list:
         if die.tag == 'T':
             total = total + die.result
@@ -62,6 +62,12 @@ def update_room_time(room_name):
     active_room = Room.objects.get(name=room_name)
     active_room.timestamp = timezone.now()
     active_room.save()
+
+def latest_update(record_list):
+    if not record_list:
+        return ''
+    latest_record = max(record_list, key=lambda r: r.updated)
+    return latest_record.updated
 
 # view functions
 
@@ -122,6 +128,7 @@ def ajax(request, room_name):
         for die in dice_list:
             die.roll()
             die.tag = 'X'
+            die.updated = timezone.now()
             die.save()
 
     if command == 'delall':
@@ -136,9 +143,11 @@ def ajax(request, room_name):
             if die.selected:
                 if die.result > 1:
                     die.tag = 'T'
+                    die.updated = timezone.now()
                 die.selected = False
             elif die.tag == 'T':
                 die.tag = 'X'
+                die.updated = timezone.now()
             die.save()
 
     if command == 'effectdice':
@@ -147,9 +156,11 @@ def ajax(request, room_name):
             if die.selected:
                 if die.result > 1:
                     die.tag = 'E'
+                    die.updated = timezone.now()
                 die.selected = False
             elif die.tag == 'E':
                 die.tag = 'X'
+                die.updated = timezone.now()
             die.save()
 
     if command == 'totalbest':
@@ -158,9 +169,11 @@ def ajax(request, room_name):
         for die in dice_list:
             if die.result > 1 and marked < 2 and die.tag != 'E':
                 die.tag = 'T'
+                die.updated = timezone.now()
                 marked += 1
             elif die.tag == 'T':
                 die.tag = 'X'
+                die.updated = timezone.now()
             die.save()
 
     if command == 'effectbest':
@@ -169,9 +182,11 @@ def ajax(request, room_name):
         for die in dice_list:
             if die.result > 1 and marked < 1 and die.tag != 'T':
                 die.tag = 'E'
+                die.updated = timezone.now()
                 marked += 1
             elif die.tag == 'E':
                 die.tag = 'X'
+                die.updated = timezone.now()
             die.save()
 
     if command == 'tagnone':
@@ -179,6 +194,7 @@ def ajax(request, room_name):
         for die in dice_list:
             if die.tag != 'X':
                 die.tag = 'X'
+                die.updated = timezone.now()
                 die.save()
 
     if command == 'keep':
@@ -197,6 +213,7 @@ def ajax(request, room_name):
                 die.faces += 2
                 die.result = 0
                 die.selected = False
+                die.updated = timezone.now()
                 die.save()
 
     if command == 'downdice':
@@ -206,6 +223,7 @@ def ajax(request, room_name):
                 die.faces -= 2
                 die.result = 0
                 die.selected = False
+                die.updated = timezone.now()
                 die.save()
 
     if command == 'clearhistory':
@@ -215,17 +233,20 @@ def ajax(request, room_name):
 
     response = {}
 
-    message_list = Message.objects.filter(room=room_name).order_by('timestamp')
+    message_list = Message.objects.filter(room=room_name).order_by('created')
     message_text_list = [{'uuid':m.uuid, 'text':m.text} for m in message_list]
     response['message_list'] = message_text_list
+    response['message_update'] = latest_update(message_list)
 
-    dice_list = Die.objects.filter(room=room_name).order_by('faces', 'timestamp')
-    dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'selected':d.selected, 'tag':d.tag, 'timestamp':d.timestamp} for d in dice_list]
+    dice_list = Die.objects.filter(room=room_name).order_by('faces', 'created')
+    dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'selected':d.selected, 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
     response['dice_list'] = dice_text_list
+    response['dice_update'] = latest_update(dice_list)
 
-    roll_list = Roll.objects.filter(room=room_name).order_by('-timestamp')
+    roll_list = Roll.objects.filter(room=room_name).order_by('-created')
     roll_text_list = [r.text for r in roll_list]
     response['roll_list'] = roll_text_list
+    response['roll_update'] = latest_update(roll_list)
 
     response['roll'] = evaluate_dice(room_name)
 

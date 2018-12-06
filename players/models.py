@@ -14,7 +14,8 @@ class Die(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     faces = models.IntegerField(default=4)
     result = models.IntegerField(default=0)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(default=timezone.now)
     selected = models.BooleanField(default=False)
     tag = models.CharField(max_length=1, default='X')
     room = models.CharField(max_length=30)
@@ -31,14 +32,16 @@ class Die(models.Model):
 class Message(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.CharField(max_length=200)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(default=timezone.now)
     room = models.CharField(max_length=30)
 
     def __str__(self):
         return '[{0}] {1}'.format(self.room, self.text)
 
 class Roll(models.Model):
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=200)
     room = models.CharField(max_length=30)
 

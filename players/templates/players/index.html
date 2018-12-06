@@ -7,8 +7,11 @@
 <link rel='stylesheet' type='text/css' href="{% static 'players/style.css' %}" />
 <script src="{% static 'players/jquery-3.3.1.min.js' %}"></script>
 <script>
+	var dice_updated = "";
 	var dice_list;
+	var messages_updated= "";
 	var message_list;
+	var rolls_updated = "";
 	var roll_list;
 	var recent_roll;
 
@@ -121,13 +124,26 @@
 			dataType : 'json',
 
 			success : function(json) {
-				dice_list = json.dice_list;
-				message_list = json.message_list;
-				recent_roll = json.roll;
-				roll_list = json.roll_list;
-				draw_dice();
-				draw_messages();
-				draw_rolls();
+				if (dice_updated != json.dice_update) {
+					dice_updated = json.dice_update;
+					dice_list = json.dice_list;
+					draw_dice();
+				}
+				if (messages_updated != json.message_update) {
+					messages_updated = json.message_update;
+					message_list = json.message_list;
+					draw_messages();
+				}
+				if (recent_roll != json.roll) {
+					recent_roll = json.roll;
+					$("#roll").empty();
+					$("#roll").append(recent_roll);
+				}
+				if (rolls_updated != json.roll_update) {
+					rolls_updated = json.roll_update;
+					roll_list = json.roll_list;
+					draw_rolls();
+				}
 
 			},
 
@@ -198,8 +214,6 @@
 	}
 
 	function draw_rolls() {
-		$("#roll").empty();
-		$("#roll").append(recent_roll);
 		$("#past-rolls").empty();
 		for (var i = 0; i < roll_list.length; i++) {
 			$("#past-rolls").append(roll_list[i] + "<br/>");
@@ -251,10 +265,10 @@
 	</div>
 </div>
 
-<div id='roll' class="roll"></div>
+<div id='roll' class="roll" aria-live="polite"></div>
 
 <div class='dice-all'>
-<div class='dice-row' id='dice-row'>
+<div class='dice-row' id='dice-row' aria-live="polite" aria-atomic="true">
 </div>
 </div>
 
@@ -268,13 +282,13 @@
 
 <div class='roll-box'>
 <div class='block-header'>Past Rolls</div>
-<div id='past-rolls'></div>
+<div id='past-rolls' aria-live="polite"></div>
 <button id="clear-history">Clear History</button>
 </div>
 
 <div class='message-box'>
 <div class='block-header'>Sticky Notes</div>
-<div id='message-table'>
+<div id='message-table' aria-live="polite">
 </div>
 <form action='message/' method='POST' id='message-form'>
 	{% csrf_token %}
