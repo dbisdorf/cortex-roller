@@ -46,8 +46,11 @@ def get_random_words(num_words):
 def evaluate_dice(room_name):
     total = 0
     effect = ''
+    any_rolled = False
     dice_list = Die.objects.filter(room=room_name).order_by('faces', 'created')
     for die in dice_list:
+        if die.result > 0:
+            any_rolled = True
         if die.tag == 'T':
             total = total + die.result
         if die.tag == 'E':
@@ -55,7 +58,10 @@ def evaluate_dice(room_name):
     if not total:
         total = 'None'
     if not effect:
-        effect = 'None'
+        if any_rolled:
+            effect = 'D4'
+        else:
+            effect = 'None'
     return 'Total: {0} - Effect: {1}'.format(total, effect)
 
 def update_room_time(room_name):
@@ -143,7 +149,7 @@ def ajax(request, room_name):
             if die.selected:
                 if die.result > 1:
                     die.tag = 'T'
-                    die.updated = timezone.now()
+                die.updated = timezone.now()
                 die.selected = False
             elif die.tag == 'T':
                 die.tag = 'X'
@@ -156,7 +162,7 @@ def ajax(request, room_name):
             if die.selected:
                 if die.result > 1:
                     die.tag = 'E'
-                    die.updated = timezone.now()
+                die.updated = timezone.now()
                 die.selected = False
             elif die.tag == 'E':
                 die.tag = 'X'

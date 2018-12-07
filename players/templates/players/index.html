@@ -8,11 +8,11 @@
 <script src="{% static 'players/jquery-3.3.1.min.js' %}"></script>
 <script>
 	var dice_updated = "";
-	var dice_list;
+	var dice_list = [];
 	var messages_updated= "";
-	var message_list;
+	var message_list = [];
 	var rolls_updated = "";
-	var roll_list;
+	var roll_list = [];
 	var recent_roll;
 
 	(function poll(){
@@ -124,12 +124,12 @@
 			dataType : 'json',
 
 			success : function(json) {
-				if (dice_updated != json.dice_update) {
+				if (dice_updated != json.dice_update || dice_list.length != json.dice_list.length) {
 					dice_updated = json.dice_update;
 					dice_list = json.dice_list;
 					draw_dice();
 				}
-				if (messages_updated != json.message_update) {
+				if (messages_updated != json.message_update || message_list.length != json.message_list.length) {
 					messages_updated = json.message_update;
 					message_list = json.message_list;
 					draw_messages();
@@ -139,7 +139,7 @@
 					$("#roll").empty();
 					$("#roll").append(recent_roll);
 				}
-				if (rolls_updated != json.roll_update) {
+				if (rolls_updated != json.roll_update || roll_list.length != json.roll_list.length) {
 					rolls_updated = json.roll_update;
 					roll_list = json.roll_list;
 					draw_rolls();
@@ -265,12 +265,12 @@
 	</div>
 </div>
 
-<div id='roll' class="roll" aria-live="polite"></div>
-
 <div class='dice-all'>
 <div class='dice-row' id='dice-row' aria-live="polite" aria-atomic="true">
 </div>
 </div>
+
+<div id='roll' class="roll" aria-live="polite"></div>
 
 <div class='bottom-info'>
 
