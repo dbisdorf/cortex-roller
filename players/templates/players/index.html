@@ -50,7 +50,7 @@
 		});
 
 		$('#roll-all').click(function() {
-			ajax_command('roll', 0);
+			ajax_command('rollall', 0);
 		});
 
 		$('#remove-all').click(function() {
@@ -95,6 +95,10 @@
 
 		$("#step-down").click(function() {
 			ajax_command("downdice", 0);
+		});
+
+		$("#roll-some").click(function() {
+			ajax_command('rolldice', 0);
 		});
 
 		$("#sort-result").click(function() {
@@ -243,9 +247,10 @@
 	Selected:
 	<button id='step-up'>Up</button>
 	<button id='step-down'>Down</button>
-	<button id='remove-some'>Remove</button>
 	<button id='total-some'>Total</button>
 	<button id='effect-some'>Effect</button>
+	<button id='roll-some'>Roll</button>
+	<button id='remove-some'>Remove</button>
 	</div>
 </div>
 

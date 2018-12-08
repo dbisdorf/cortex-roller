@@ -127,13 +127,24 @@ def ajax(request, room_name):
         new_die = Die(room=room_name, faces=param)
         new_die.save()
 
-    if command == 'roll':
+    if command == 'rollall':
         random.seed()
         dice_text_list = []
         dice_list = Die.objects.filter(room=room_name)
         for die in dice_list:
             die.roll()
             die.tag = 'X'
+            die.updated = timezone.now()
+            die.save()
+
+    if command == 'rolldice':
+        random.seed()
+        dice_text_list = []
+        dice_list = Die.objects.filter(room=room_name, selected=True)
+        for die in dice_list:
+            die.roll()
+            die.tag = 'X'
+            die.selected = False
             die.updated = timezone.now()
             die.save()
 
