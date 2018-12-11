@@ -139,12 +139,12 @@ def ajax(request, room_name):
 
     if command == 'rolldice':
         random.seed()
+        selected_ids = param.split(',')
         dice_text_list = []
-        dice_list = Die.objects.filter(room=room_name, selected=True)
+        dice_list = Die.objects.filter(room=room_name, uuid__in=selected_ids)
         for die in dice_list:
             die.roll()
             die.tag = 'X'
-            die.selected = False
             die.updated = timezone.now()
             die.save()
 
@@ -152,29 +152,31 @@ def ajax(request, room_name):
         Die.objects.filter(room=room_name).delete()
 
     if command == 'deldice':
-        Die.objects.filter(room=room_name, selected=True).delete()
+        selected_ids = param.split(',')
+        Die.objects.filter(room=room_name, uuid__in=selected_ids).delete()
 
     if command == 'totaldice':
+        selected_ids = param.split(',')
         dice_list = Die.objects.filter(room=room_name)
         for die in dice_list:
-            if die.selected:
+            if str(die.uuid) in selected_ids:
+                print('in selection');
                 if die.result > 1:
                     die.tag = 'T'
                 die.updated = timezone.now()
-                die.selected = False
             elif die.tag == 'T':
                 die.tag = 'X'
                 die.updated = timezone.now()
             die.save()
 
     if command == 'effectdice':
+        selected_ids = param.split(',')
         dice_list = Die.objects.filter(room=room_name)
         for die in dice_list:
-            if die.selected:
+            if str(die.uuid) in selected_ids:
                 if die.result > 1:
                     die.tag = 'E'
                 die.updated = timezone.now()
-                die.selected = False
             elif die.tag == 'E':
                 die.tag = 'X'
                 die.updated = timezone.now()
@@ -218,28 +220,30 @@ def ajax(request, room_name):
         new_roll = Roll(room=room_name, text=evaluate_dice(room_name))
         new_roll.save()
 
+    '''
     if command == 'toggledie':
         die = Die.objects.get(uuid=param)
         die.selected = not die.selected
         die.save()
+    '''
 
     if command == 'updice':
-        dice_list = Die.objects.filter(room=room_name)
+        selected_ids = param.split(',')
+        dice_list = Die.objects.filter(room=room_name, uuid__in=selected_ids)
         for die in dice_list:
-            if die.selected and die.faces < 12:
+            if die.faces < 12:
                 die.faces += 2
                 die.result = 0
-                die.selected = False
                 die.updated = timezone.now()
                 die.save()
 
     if command == 'downdice':
-        dice_list = Die.objects.filter(room=room_name)
+        selected_ids = param.split(',')
+        dice_list = Die.objects.filter(room=room_name, uuid__in=selected_ids)
         for die in dice_list:
-            if die.selected and die.faces > 4:
+            if die.faces > 4:
                 die.faces -= 2
                 die.result = 0
-                die.selected = False
                 die.updated = timezone.now()
                 die.save()
 
@@ -256,7 +260,7 @@ def ajax(request, room_name):
     response['message_update'] = latest_update(message_list)
 
     dice_list = Die.objects.filter(room=room_name).order_by('faces', 'created')
-    dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'selected':d.selected, 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
+    dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
     response['dice_list'] = dice_text_list
     response['dice_update'] = latest_update(dice_list)
 

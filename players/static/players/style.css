@@ -22,6 +22,18 @@
 	width: 50%;
 }
 
+.half-button {
+	width: 47%;
+}
+
+.third-button {
+	width: 32%;
+}
+
+.fifth-button {
+	width: 18%;
+}
+
 .dice-all {
 	display: table;
 	border-collapse: separate;
@@ -29,7 +41,7 @@
 }
 
 .dice-box {
-	border: 1px solid #333;
+	border: 1px solid;
 	text-align: center;
 	padding: 5px;
 	width: 70px;
@@ -54,7 +66,6 @@
 	text-align: center;
 	font-weight: bold;
 	font-size: large;
-	height: 50px;
 }
 
 .bottom-info {
@@ -88,7 +99,7 @@
 .message-class {
 	display: table-cell;
 	width: 300px;
-	border: 1px solid #333;
+	border: 1px solid;
 	text-align: center;
 	padding: 10px;
 }

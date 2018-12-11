@@ -58,7 +58,7 @@
 		});
 
 		$('#remove-some').click(function() {
-			ajax_command('deldice', 0);
+			ajax_command('deldice', checked_dice_ids());
 		});
 
 		$("#keep-dice").click(function() {
@@ -66,11 +66,11 @@
 		});
 
 		$("#total-some").click(function() {
-			ajax_command('totaldice', 0);
+			ajax_command('totaldice', checked_dice_ids());
 		});
 
 		$("#effect-some").click(function() {
-			ajax_command("effectdice", 0);
+			ajax_command("effectdice", checked_dice_ids());
 		});
 
 		$("#clear-history").click(function() {
@@ -90,24 +90,26 @@
 		});
 
 		$("#step-up").click(function() {
-			ajax_command("updice", 0);
+			ajax_command("updice", checked_dice_ids());
 		});
 
 		$("#step-down").click(function() {
-			ajax_command("downdice", 0);
+			ajax_command("downdice", checked_dice_ids());
 		});
 
 		$("#roll-some").click(function() {
-			ajax_command('rolldice', 0);
+			ajax_command('rolldice', checked_dice_ids());
 		});
 
 		$("#sort-result").click(function() {
 			draw_dice();
 		});
 
+		/*
 		$(document).on("click", ".dice-check", function() {
 			ajax_command("toggledie", $( this ).attr('id'));
 		});
+		*/
 
 		$(document).on("click", ".del-message", function() {
 			var message_id = $( this ).attr("id").substring(4);
@@ -196,17 +198,13 @@
 			if (result == 0) {
 				result = '&nbsp;';
 			}
-			var selected = "";
-			if (dice_list[i].selected) {
-				selected = "checked";
-			}
 			var die_tag = '';
 			if (dice_list[i].tag == "T") {
 				die_tag = "Total";
 			} else if (dice_list[i].tag == "E") {
 				die_tag = "Effect";
 			}
-			$('#dice-row').append("<div class='dice-box dice-image" + faces + "'>D" + faces + "<br><span style='font-size:xx-large'>" + result + "</span><br>" + die_tag + "<input type='checkbox' class='dice-check' id='" + uuid + "' " + selected + "></input></div>");
+			$('#dice-row').append("<div class='dice-box dice-image" + faces + "'>D" + faces + "<br><span style='font-size:xx-large'>" + result + "</span><br>" + die_tag + "<input type='checkbox' class='dice-check' id='" + uuid + "'></input></div>");
 		}
 	}
 
@@ -224,6 +222,14 @@
 		}
 	}
 
+	function checked_dice_ids() {
+		var ids = [];
+		$(".dice-check").filter(":checked").each(function(index) {
+			ids.push($( this ).attr("id"));
+		});
+		return ids.join(",");
+	}
+
 </script>
 
 </head>
@@ -235,38 +241,35 @@
 
 <div class="button-row">
 	<div class="button-group">
-	Add:
-	<button id='d4-add'>D4</button>
-	<button id='d6-add'>D6</button>
-	<button id='d8-add'>D8</button>
-	<button id='d10-add'>D10</button>
-	<button id='d12-add'>D12</button>
+	<button id='d4-add' class='fifth-button'>Add D4</button>
+	<button id='d6-add' class='fifth-button'>Add D6</button>
+	<button id='d8-add' class='fifth-button'>Add D8</button>
+	<button id='d10-add' class='fifth-button'>Add D10</button>
+	<button id='d12-add' class='fifth-button'>Add D12</button>
 	</div>
 
 	<div class="button-group">
-	Selected:
-	<button id='step-up'>Up</button>
-	<button id='step-down'>Down</button>
-	<button id='total-some'>Total</button>
-	<button id='effect-some'>Effect</button>
-	<button id='roll-some'>Roll</button>
-	<button id='remove-some'>Remove</button>
+	<button id="total-best" class='third-button'>Choose Best Total</button>
+	<button id="effect-best" class='third-button'>Choose Best Effect</button>
+	<button id="tag-none" class='third-button'>Clear Total &amp; Effect</button>
 	</div>
 </div>
 
 <div class="button-row">
 	<div class="button-group">
-	Mark Best:
-	<button id="total-best">Total</button>
-	<button id="effect-best">Effect</button>
-	<button id="tag-none">None</button>
+	<button id='step-up' class='half-button'>Step Up Checked Dice</button>
+	<button id='step-down' class='half-button'>Step Down Checked Dice</button>
+	<br>
+	<button id='roll-some' class='half-button'>Roll Checked Dice</button>
+	<button id='remove-some' class='half-button'>Remove Checked Dice</button>
+	<br>
+	<button id='total-some' class='half-button'>Checked Dice Are Total</button>
+	<button id='effect-some' class='half-button'>Checked Dice Are Effect</button>
 	</div>
 
 	<div class="button-group">
-	All:
-	<button id='roll-all'>Roll</button>
-	<button id='remove-all'>Remove</button>
-	<button id='keep-dice'>Keep</button>
+	<button id='roll-all' class='half-button'>Roll All Dice</button>
+	<button id='remove-all' class='half-button'>Remove All Dice</button>
 	</div>
 </div>
 
@@ -276,6 +279,9 @@
 </div>
 
 <div id='roll' class="roll" aria-live="polite"></div>
+<div class="roll">
+<button id='keep-dice'>Keep Results</button>
+</div>
 
 <div class='bottom-info'>
 
