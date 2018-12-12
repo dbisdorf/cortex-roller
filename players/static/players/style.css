@@ -51,6 +51,13 @@
 }
 
 .dice-check {
+}
+
+.inline-check {
+	margin-right: 15px;
+}
+
+.right-check {
 	float: right;
 }
 

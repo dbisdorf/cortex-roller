@@ -112,6 +112,8 @@ def ajax(request, room_name):
     command = request.POST.get('command', None)
     param = request.POST.get('param', None)
 
+    valid_command = True
+
     if command == 'message':
         new_message_text = param
 
@@ -120,14 +122,14 @@ def ajax(request, room_name):
         new_message = Message(room=room_name, text=new_message_text)
         new_message.save()
 
-    if command == 'delmessage':
+    elif command == 'delmessage':
         Message.objects.filter(uuid=param).delete()
 
-    if command == 'adddie':
+    elif command == 'adddie':
         new_die = Die(room=room_name, faces=param)
         new_die.save()
 
-    if command == 'rollall':
+    elif command == 'rollall':
         random.seed()
         dice_text_list = []
         dice_list = Die.objects.filter(room=room_name)
@@ -137,7 +139,7 @@ def ajax(request, room_name):
             die.updated = timezone.now()
             die.save()
 
-    if command == 'rolldice':
+    elif command == 'rolldice':
         random.seed()
         selected_ids = param.split(',')
         dice_text_list = []
@@ -148,14 +150,14 @@ def ajax(request, room_name):
             die.updated = timezone.now()
             die.save()
 
-    if command == 'delall':
+    elif command == 'delall':
         Die.objects.filter(room=room_name).delete()
 
-    if command == 'deldice':
+    elif command == 'deldice':
         selected_ids = param.split(',')
         Die.objects.filter(room=room_name, uuid__in=selected_ids).delete()
 
-    if command == 'totaldice':
+    elif command == 'totaldice':
         selected_ids = param.split(',')
         dice_list = Die.objects.filter(room=room_name)
         for die in dice_list:
@@ -169,7 +171,7 @@ def ajax(request, room_name):
                 die.updated = timezone.now()
             die.save()
 
-    if command == 'effectdice':
+    elif command == 'effectdice':
         selected_ids = param.split(',')
         dice_list = Die.objects.filter(room=room_name)
         for die in dice_list:
@@ -182,7 +184,7 @@ def ajax(request, room_name):
                 die.updated = timezone.now()
             die.save()
 
-    if command == 'totalbest':
+    elif command == 'totalbest':
         marked = 0
         dice_list = Die.objects.filter(room=room_name).order_by('-result')
         for die in dice_list:
@@ -195,7 +197,7 @@ def ajax(request, room_name):
                 die.updated = timezone.now()
             die.save()
 
-    if command == 'effectbest':
+    elif command == 'effectbest':
         marked = 0
         dice_list = Die.objects.filter(room=room_name).order_by('-faces')
         for die in dice_list:
@@ -208,7 +210,7 @@ def ajax(request, room_name):
                 die.updated = timezone.now()
             die.save()
 
-    if command == 'tagnone':
+    elif command == 'tagnone':
         dice_list = Die.objects.filter(room=room_name)
         for die in dice_list:
             if die.tag != 'X':
@@ -216,18 +218,11 @@ def ajax(request, room_name):
                 die.updated = timezone.now()
                 die.save()
 
-    if command == 'keep':
+    elif command == 'keep':
         new_roll = Roll(room=room_name, text=evaluate_dice(room_name))
         new_roll.save()
 
-    '''
-    if command == 'toggledie':
-        die = Die.objects.get(uuid=param)
-        die.selected = not die.selected
-        die.save()
-    '''
-
-    if command == 'updice':
+    elif command == 'updice':
         selected_ids = param.split(',')
         dice_list = Die.objects.filter(room=room_name, uuid__in=selected_ids)
         for die in dice_list:
@@ -237,7 +232,7 @@ def ajax(request, room_name):
                 die.updated = timezone.now()
                 die.save()
 
-    if command == 'downdice':
+    elif command == 'downdice':
         selected_ids = param.split(',')
         dice_list = Die.objects.filter(room=room_name, uuid__in=selected_ids)
         for die in dice_list:
@@ -247,10 +242,14 @@ def ajax(request, room_name):
                 die.updated = timezone.now()
                 die.save()
 
-    if command == 'clearhistory':
+    elif command == 'clearhistory':
         Roll.objects.filter(room=room_name).delete()
 
-    update_room_time(room_name)
+    elif command != 'poll':
+        valid_command = False
+
+    if valid_command and command != 'poll':
+        update_room_time(room_name)
 
     response = {}
 
