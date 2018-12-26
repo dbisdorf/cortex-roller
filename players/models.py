@@ -16,7 +16,6 @@ class Die(models.Model):
     result = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(default=timezone.now)
-    selected = models.BooleanField(default=False)
     tag = models.CharField(max_length=1, default='X')
     room = models.CharField(max_length=30)
 

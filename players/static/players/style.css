@@ -53,20 +53,16 @@ h1 {
 .dice-check {
 }
 
+.dice-result {
+	font-size: xx-large;
+}
+
 .inline-check {
 	margin-right: 15px;
 }
 
 .right-check {
 	float: right;
-}
-
-.dice-unselected {
-	background-color: white;
-}
-
-.dice-selected {
-	background-color: gray;
 }
 
 .roll {
