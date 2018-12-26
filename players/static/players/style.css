@@ -41,8 +41,8 @@ h1 {
 }
 
 .dice-box {
-	border: 1px solid;
 	text-align: center;
+	border: 1px solid;
 	padding: 5px;
 	width: 70px;
 	display: table-cell;
@@ -53,8 +53,18 @@ h1 {
 .dice-check {
 }
 
+.dice-faces {
+	margin: 0px;
+}
+
 .dice-result {
 	font-size: xx-large;
+	margin: 0px;
+}
+
+.dice-tag {
+	text-align: left;
+	margin: 0px;
 }
 
 .inline-check {

@@ -224,7 +224,7 @@
 				} else if (tag == "E") {
 					verbose_tag = "Effect";
 				}
-				$('#dice-row').append("<div class='dice-box dice-image" + faces + "'>D" + faces + "<br><span class='dice-result'>" + result + "</span><br>" + verbose_tag + "<input type='checkbox' class='dice-check right-check' id='" + uuid + "'></div>");
+				$('#dice-row').append("<div class='dice-box dice-image" + faces + "'><p class='dice-faces'>D" + faces + "</p><p class='dice-result'>" + result + "</p><p class='dice-tag'>" + verbose_tag + "<input type='checkbox' class='dice-check right-check' id='" + uuid + "'></p></div>");
 			}
 		}
 	}
