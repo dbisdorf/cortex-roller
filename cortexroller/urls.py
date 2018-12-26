@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.http import HttpResponseRedirect
 
 urlpatterns = [
+    path('', lambda r: HttpResponseRedirect('/cortex/players/')),
     path('players/', include('players.urls')),
     path('admin/', admin.site.urls),
 ]
