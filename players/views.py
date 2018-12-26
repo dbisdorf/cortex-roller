@@ -180,7 +180,7 @@ def ajax(request, room_name):
 
     elif command == 'totalbest':
         marked = 0
-        dice_list = Die.objects.filter(room=room_name).order_by('-result')
+        dice_list = Die.objects.filter(room=room_name).order_by('-result', 'faces')
         for die in dice_list:
             if die.result > 1 and marked < 2 and die.tag != 'E':
                 die.tag = 'T'
@@ -193,7 +193,7 @@ def ajax(request, room_name):
 
     elif command == 'effectbest':
         marked = 0
-        dice_list = Die.objects.filter(room=room_name).order_by('-faces')
+        dice_list = Die.objects.filter(room=room_name).order_by('-faces', 'result')
         for die in dice_list:
             if die.result > 1 and marked < 1 and die.tag != 'T':
                 die.tag = 'E'
