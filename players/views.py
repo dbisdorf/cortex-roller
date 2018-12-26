@@ -100,13 +100,7 @@ def index(request, room_name=None):
         new_room.save()
         return redirect(reverse('index') + new_room_name + '/')
 
-    result_dice_list = Die.objects.all()
-
-    context = {
-            'result_dice_list': result_dice_list
-    }
-    return render(request, 'players/index.html', context)
-
+    return render(request, 'players/index.html', {})
 
 def ajax(request, room_name):
     command = request.POST.get('command', None)
@@ -258,7 +252,7 @@ def ajax(request, room_name):
     response['message_list'] = message_text_list
     response['message_update'] = latest_update(message_list)
 
-    dice_list = Die.objects.filter(room=room_name).order_by('faces', 'created')
+    dice_list = Die.objects.filter(room=room_name)
     dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
     response['dice_list'] = dice_text_list
     response['dice_update'] = latest_update(dice_list)
