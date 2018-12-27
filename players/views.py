@@ -80,7 +80,7 @@ def latest_update(record_list):
 def index(request, room_name=None):
     if not room_name:
         # purge old rooms
-        purge_time = timezone.now() - datetime.timedelta(days=30)
+        purge_time = timezone.now() - datetime.timedelta(days=15)
         old_rooms = Room.objects.filter(timestamp__lt=purge_time)
         for old_room in old_rooms:
             Die.objects.filter(room=old_room.name).delete()
