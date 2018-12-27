@@ -57,6 +57,11 @@ h2 {
 	background-repeat: no-repeat;
 }
 
+.dice-spacer {
+	display: table-cell;
+	width: 20px;
+}
+
 .dice-check {
 }
 
