@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Cortex Roller</title>
+<title>Cortexatron</title>
 
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
@@ -134,31 +134,34 @@
 			dataType : 'json',
 
 			success : function(json) {
-				if (dice_updated != json.dice_update || dice_list.length != json.dice_list.length) {
-					dice_updated = json.dice_update;
-					dice_list = json.dice_list;
-					draw_dice();
+				if (json.error) {
+					draw_error(json.error);
+				} else {
+					if (dice_updated != json.dice_update || dice_list.length != json.dice_list.length) {
+						dice_updated = json.dice_update;
+						dice_list = json.dice_list;
+						draw_dice();
+					}
+					if (messages_updated != json.message_update || message_list.length != json.message_list.length) {
+						messages_updated = json.message_update;
+						message_list = json.message_list;
+						draw_messages();
+					}
+					if (recent_roll != json.roll) {
+						recent_roll = json.roll;
+						$("#roll").empty();
+						$("#roll").append(recent_roll);
+					}
+					if (rolls_updated != json.roll_update || roll_list.length != json.roll_list.length) {
+						rolls_updated = json.roll_update;
+						roll_list = json.roll_list;
+						draw_rolls();
+					}
 				}
-				if (messages_updated != json.message_update || message_list.length != json.message_list.length) {
-					messages_updated = json.message_update;
-					message_list = json.message_list;
-					draw_messages();
-				}
-				if (recent_roll != json.roll) {
-					recent_roll = json.roll;
-					$("#roll").empty();
-					$("#roll").append(recent_roll);
-				}
-				if (rolls_updated != json.roll_update || roll_list.length != json.roll_list.length) {
-					rolls_updated = json.roll_update;
-					roll_list = json.roll_list;
-					draw_rolls();
-				}
-
 			},
 
 			error : function(xhr, errmsg, err) {
-				console.log("must be an ajax error")
+				draw_error("AJAX error");
 			}
 		});
 	}
@@ -243,6 +246,16 @@
 		}
 	}
 
+	function draw_error(message) {
+		$("#error-box").empty();
+		if (message) {
+			$("#error-box").append(message);
+			setTimeout(draw_error, 5000);
+		} else {
+			$("#error-box").append("&nbsp;");
+		}
+	}
+
 	function checked_dice_ids() {
 		var ids = [];
 		$(".dice-check").filter(":checked").each(function(index) {
@@ -262,6 +275,7 @@
 
 <div class="button-row">
 	<div class="button-group">
+	<h2>Add Dice</h2>
 	<button id='d4-add' class='fifth-button'>Add D4</button>
 	<button id='d6-add' class='fifth-button'>Add D6</button>
 	<button id='d8-add' class='fifth-button'>Add D8</button>
@@ -270,6 +284,7 @@
 	</div>
 
 	<div class="button-group">
+	<h2>Quick Choices</h2>
 	<button id="total-best" class='third-button'>Choose Best Total</button>
 	<button id="effect-best" class='third-button'>Choose Best Effect</button>
 	<button id="tag-none" class='third-button'>Clear Total &amp; Effect</button>
@@ -278,6 +293,7 @@
 
 <div class="button-row">
 	<div class="button-group">
+	<h2>For Checked Dice</h2>
 	<button id='step-up' class='half-button'>Step Up Checked Dice</button>
 	<button id='step-down' class='half-button'>Step Down Checked Dice</button>
 	<br>
@@ -289,11 +305,13 @@
 	</div>
 
 	<div class="button-group">
+	<h2>For All Dice</h2>
 	<button id='roll-all' class='half-button'>Roll All Dice</button>
 	<button id='remove-all' class='half-button'>Remove All Dice</button>
 	</div>
 </div>
 
+<h2>Dice</h2>
 <div class='dice-all'>
 <div class='dice-row' id='dice-row' aria-live="polite">
 </div>
@@ -336,8 +354,12 @@
 
 </div>
 
+<div id="error-box" class="error-box">
+&nbsp;
+</div>
+
 <div class="about-box">
-Cortexatron (Cortex RPG Die Roller) v0.2 - Send the address of this page to your other players! - 
+Cortexatron (Cortex RPG Die Roller) v0.3 - Send the address of this page to your other players! - 
 <a href="{% static 'players/about.html' %}" target="_blank">About</a>
 </div>
 

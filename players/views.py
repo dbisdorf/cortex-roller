@@ -242,27 +242,30 @@ def ajax(request, room_name):
     elif command != 'poll':
         valid_command = False
 
-    if valid_command and command != 'poll':
-        update_room_time(room_name)
-
     response = {}
 
-    message_list = Message.objects.filter(room=room_name).order_by('created')
-    message_text_list = [{'uuid':m.uuid, 'text':m.text} for m in message_list]
-    response['message_list'] = message_text_list
-    response['message_update'] = latest_update(message_list)
+    if valid_command:
+        if command != 'poll':
+            update_room_time(room_name)
 
-    dice_list = Die.objects.filter(room=room_name)
-    dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
-    response['dice_list'] = dice_text_list
-    response['dice_update'] = latest_update(dice_list)
+        message_list = Message.objects.filter(room=room_name).order_by('created')
+        message_text_list = [{'uuid':m.uuid, 'text':m.text} for m in message_list]
+        response['message_list'] = message_text_list
+        response['message_update'] = latest_update(message_list)
 
-    roll_list = Roll.objects.filter(room=room_name).order_by('-created')
-    roll_text_list = [r.text for r in roll_list]
-    response['roll_list'] = roll_text_list
-    response['roll_update'] = latest_update(roll_list)
+        dice_list = Die.objects.filter(room=room_name)
+        dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
+        response['dice_list'] = dice_text_list
+        response['dice_update'] = latest_update(dice_list)
 
-    response['roll'] = evaluate_dice(room_name)
+        roll_list = Roll.objects.filter(room=room_name).order_by('-created')
+        roll_text_list = [r.text for r in roll_list]
+        response['roll_list'] = roll_text_list
+        response['roll_update'] = latest_update(roll_list)
+
+        response['roll'] = evaluate_dice(room_name)
+    else:
+        response['error'] = 'Invalid command'
 
     return JsonResponse(response)
 

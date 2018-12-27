@@ -11,6 +11,13 @@ h1 {
 	background: black;
 }
 
+h2 {
+	text-align: center;
+	font-size: large;
+	font-weight: bold;
+	margin: 0px;
+}
+
 .button-row {
 	display: table;
 	width: 100%;
@@ -127,6 +134,12 @@ h1 {
 	border: 1px solid;
 	padding: 5px;
 	text-align: center;
+}
+
+.error-box {
+	text-align: center;
+	font-weight: bold;
+	color: red;
 }
 
 .dice-image4 {
