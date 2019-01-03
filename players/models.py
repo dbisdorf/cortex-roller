@@ -5,6 +5,7 @@ import uuid
 
 class Room(models.Model):
     name = models.CharField(primary_key=True, max_length=30)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -17,7 +18,7 @@ class Die(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(default=timezone.now)
     tag = models.CharField(max_length=1, default='X')
-    room = models.CharField(max_length=30)
+    owner = models.UUIDField()
 
     def __str__(self):
         if self.result:
@@ -33,16 +34,16 @@ class Message(models.Model):
     text = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(default=timezone.now)
-    room = models.CharField(max_length=30)
+    owner = models.UUIDField()
 
     def __str__(self):
         return '[{0}] {1}'.format(self.room, self.text)
 
 class Roll(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(default=timezone.now)
-    text = models.CharField(max_length=200)
-    room = models.CharField(max_length=30)
+    owner = models.UUIDField()
 
     def __str__(self):
         return '[{0}] {1}'.format(self.room, self.text)

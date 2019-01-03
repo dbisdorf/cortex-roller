@@ -47,6 +47,11 @@ h2 {
 	border-spacing: 5px;
 }
 
+.dice-all-centered {
+	display: table;
+	margin: auto;
+}
+
 .dice-box {
 	text-align: center;
 	border: 1px solid;
@@ -76,6 +81,10 @@ h2 {
 
 .dice-tag {
 	text-align: left;
+	margin: 0px;
+}
+
+.dice-tag-centered {
 	margin: 0px;
 }
 

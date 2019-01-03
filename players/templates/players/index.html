@@ -270,7 +270,7 @@
 	function draw_rolls() {
 		$("#past-rolls").empty();
 		for (var i = 0; i < roll_list.length; i++) {
-			$("#past-rolls").append(roll_list[i] + "<br/>");
+			$("#past-rolls").append("<a href='../rolls/" + roll_list[i].uuid + "' target='_blank'>" + roll_list[i].text + "</a><br/>");
 		}
 	}
 

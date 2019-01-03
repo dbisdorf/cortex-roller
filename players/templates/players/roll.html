@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>Cortexatron Dice Roll</title>
+{% load static %}
+<link rel='stylesheet' type='text/css' href="{% static 'players/style.css' %}" />
+</head>
+
+<body>
+	<div class="big-box">
+		<h1>Cortexatron Dice Roll: {{ timestamp }}</h1>
+		<div class="dice-all-centered">
+			{% for die in dice %}
+			<div class='dice-box dice-image{{ die.faces }}'>
+				<p class='dice-faces'>D{{ die.faces }}</p>
+				<p class='dice-result'>{{ die.result }}</p>
+				<p class='dice-tag-centered'>
+				{% if die.tag == "T" %}
+					Total
+				{% else %}
+					Effect
+				{% endif %}
+				</p>
+			</div>
+			{% endfor %}
+		</div>
+		<p class="roll">{{ overall }}</p>
+	</div>
+</body>
+</html>
+

@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, reverse
 from django.utils import timezone
 from .models import Die, Message, Roll, Room
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+#from PIL import Image, ImageDraw, ImageFont
+import io
 import json
 import random
 import datetime
@@ -35,6 +37,8 @@ WORDS = [
         'Zebra', 'Zilch', 'Zinc'
 ]
 
+ROLL_FETCH_LIMIT = 10
+
 # utility functions
 
 def get_random_words(num_words):
@@ -43,11 +47,13 @@ def get_random_words(num_words):
         all.append(random.choice(WORDS))
     return ''.join(all)
 
-def evaluate_dice(room_name):
+def get_dice_from_roll(roll_uuid):
+    return Die.objects.filter(owner=roll_uuid)
+
+def evaluate_dice(dice_list):
     total = 0
     effect = ''
     any_rolled = False
-    dice_list = Die.objects.filter(room=room_name).order_by('faces', 'created')
     for die in dice_list:
         if die.result > 0:
             any_rolled = True
@@ -64,11 +70,6 @@ def evaluate_dice(room_name):
             effect = 'None'
     return 'Total: {0} - Effect: {1}'.format(total, effect)
 
-def update_room_time(room_name):
-    active_room = Room.objects.get(name=room_name)
-    active_room.timestamp = timezone.now()
-    active_room.save()
-
 def latest_update(record_list):
     if not record_list:
         return ''
@@ -83,9 +84,9 @@ def index(request, room_name=None):
         purge_time = timezone.now() - datetime.timedelta(days=15)
         old_rooms = Room.objects.filter(timestamp__lt=purge_time)
         for old_room in old_rooms:
-            Die.objects.filter(room=old_room.name).delete()
-            Message.objects.filter(room=old_room.name).delete()
-            Roll.objects.filter(room=old_room.name).delete()
+            Die.objects.filter(owner=old_room.uuid).delete()
+            Message.objects.filter(owner=old_room.uuid).delete()
+            Roll.objects.filter(owner=old_room.uuid).delete()
             old_room.delete()
 
         # choose new room
@@ -105,6 +106,7 @@ def index(request, room_name=None):
 def ajax(request, room_name):
     command = request.POST.get('command', None)
     param = request.POST.get('param', None)
+    room = Room.objects.get(name=room_name)
 
     valid_command = True
 
@@ -113,20 +115,20 @@ def ajax(request, room_name):
 
         if not new_message_text:
             new_message_text = '...'
-        new_message = Message(room=room_name, text=new_message_text)
+        new_message = Message(owner=room.uuid, text=new_message_text)
         new_message.save()
 
     elif command == 'delmessage':
         Message.objects.filter(uuid=param).delete()
 
     elif command == 'adddie':
-        new_die = Die(room=room_name, faces=param)
+        new_die = Die(owner=room.uuid, faces=param)
         new_die.save()
 
     elif command == 'rollall':
         random.seed()
         dice_text_list = []
-        dice_list = Die.objects.filter(room=room_name)
+        dice_list = Die.objects.filter(owner=room.uuid)
         for die in dice_list:
             die.roll()
             die.tag = 'X'
@@ -137,7 +139,7 @@ def ajax(request, room_name):
         random.seed()
         selected_ids = param.split(',')
         dice_text_list = []
-        dice_list = Die.objects.filter(room=room_name, uuid__in=selected_ids)
+        dice_list = Die.objects.filter(owner=room.uuid, uuid__in=selected_ids)
         for die in dice_list:
             die.roll()
             die.tag = 'X'
@@ -145,15 +147,15 @@ def ajax(request, room_name):
             die.save()
 
     elif command == 'delall':
-        Die.objects.filter(room=room_name).delete()
+        Die.objects.filter(owner=room.uuid).delete()
 
     elif command == 'deldice':
         selected_ids = param.split(',')
-        Die.objects.filter(room=room_name, uuid__in=selected_ids).delete()
+        Die.objects.filter(owner=room.uuid, uuid__in=selected_ids).delete()
 
     elif command == 'totaldice':
         selected_ids = param.split(',')
-        dice_list = Die.objects.filter(room=room_name)
+        dice_list = Die.objects.filter(owner=room.uuid)
         for die in dice_list:
             if str(die.uuid) in selected_ids:
                 print('in selection');
@@ -167,7 +169,7 @@ def ajax(request, room_name):
 
     elif command == 'effectdice':
         selected_ids = param.split(',')
-        dice_list = Die.objects.filter(room=room_name)
+        dice_list = Die.objects.filter(owner=room.uuid)
         for die in dice_list:
             if str(die.uuid) in selected_ids:
                 if die.result > 1:
@@ -180,7 +182,7 @@ def ajax(request, room_name):
 
     elif command == 'totalbest':
         marked = 0
-        dice_list = Die.objects.filter(room=room_name).order_by('-result', 'faces')
+        dice_list = Die.objects.filter(owner=room.uuid).order_by('-result', 'faces')
         for die in dice_list:
             if die.result > 1 and marked < 2 and die.tag != 'E':
                 die.tag = 'T'
@@ -193,7 +195,7 @@ def ajax(request, room_name):
 
     elif command == 'effectbest':
         marked = 0
-        dice_list = Die.objects.filter(room=room_name).order_by('-faces', 'result')
+        dice_list = Die.objects.filter(owner=room.uuid).order_by('-faces', 'result')
         for die in dice_list:
             if die.result > 1 and marked < 1 and die.tag != 'T':
                 die.tag = 'E'
@@ -205,7 +207,7 @@ def ajax(request, room_name):
             die.save()
 
     elif command == 'tagnone':
-        dice_list = Die.objects.filter(room=room_name)
+        dice_list = Die.objects.filter(owner=room.uuid)
         for die in dice_list:
             if die.tag != 'X':
                 die.tag = 'X'
@@ -213,12 +215,16 @@ def ajax(request, room_name):
                 die.save()
 
     elif command == 'keep':
-        new_roll = Roll(room=room_name, text=evaluate_dice(room_name))
+        new_roll = Roll(owner=room.uuid)
         new_roll.save()
+        dice_list = Die.objects.filter(owner=room.uuid, tag__in='TE')
+        for die in dice_list:
+            copy_die = Die(faces=die.faces, result=die.result, tag=die.tag, owner=new_roll.uuid)
+            copy_die.save()
 
     elif command == 'updice':
         selected_ids = param.split(',')
-        dice_list = Die.objects.filter(room=room_name, uuid__in=selected_ids)
+        dice_list = Die.objects.filter(owner=room.uuid, uuid__in=selected_ids)
         for die in dice_list:
             if die.faces < 12:
                 die.faces += 2
@@ -228,7 +234,7 @@ def ajax(request, room_name):
 
     elif command == 'downdice':
         selected_ids = param.split(',')
-        dice_list = Die.objects.filter(room=room_name, uuid__in=selected_ids)
+        dice_list = Die.objects.filter(owner=room.uuid, uuid__in=selected_ids)
         for die in dice_list:
             if die.faces > 4:
                 die.faces -= 2
@@ -237,7 +243,7 @@ def ajax(request, room_name):
                 die.save()
 
     elif command == 'clearhistory':
-        Roll.objects.filter(room=room_name).delete()
+        Roll.objects.filter(owner=room.uuid).delete()
 
     elif command != 'poll':
         valid_command = False
@@ -246,26 +252,47 @@ def ajax(request, room_name):
 
     if valid_command:
         if command != 'poll':
-            update_room_time(room_name)
+            # update room timestamp
+            room.timestamp = timezone.now()
+            room.save()
 
-        message_list = Message.objects.filter(room=room_name).order_by('created')
+        message_list = Message.objects.filter(owner=room.uuid).order_by('created')
         message_text_list = [{'uuid':m.uuid, 'text':m.text} for m in message_list]
         response['message_list'] = message_text_list
         response['message_update'] = latest_update(message_list)
 
-        dice_list = Die.objects.filter(room=room_name)
+        dice_list = Die.objects.filter(owner=room.uuid).order_by('faces')
         dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
         response['dice_list'] = dice_text_list
         response['dice_update'] = latest_update(dice_list)
 
-        roll_list = Roll.objects.filter(room=room_name).order_by('-created')
-        roll_text_list = [r.text for r in roll_list]
+        roll_list = Roll.objects.filter(owner=room.uuid).order_by('-created')[:ROLL_FETCH_LIMIT]
+        roll_text_list = [{'uuid':r.uuid, 'text':evaluate_dice(Die.objects.filter(owner=r.uuid).order_by('faces'))} for r in roll_list]
         response['roll_list'] = roll_text_list
         response['roll_update'] = latest_update(roll_list)
 
-        response['roll'] = evaluate_dice(room_name)
+        response['roll'] = evaluate_dice(dice_list)
     else:
         response['error'] = 'Invalid command'
 
     return JsonResponse(response)
+
+def rolls(request, roll_id):
+    roll = Roll.objects.get(uuid=roll_id)
+    dice = Die.objects.filter(owner=roll_id).order_by('-tag', 'faces')
+
+    '''
+    image = Image.new('RGB', (640, 160), (255, 255, 255))
+    image.paste(d4, (0, 0))
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.load_default()
+    draw.text((10, 10), roll.text, fill=(0, 0, 0), font=font)
+
+    response = HttpResponse(content_type='image/jpeg')
+    image.save(response, 'JPEG')
+    return response
+    '''
+
+    context = {'timestamp': roll.updated, 'overall': evaluate_dice(dice), 'dice':dice}
+    return render(request, 'players/roll.html', context)
 
