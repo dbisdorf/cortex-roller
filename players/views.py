@@ -38,6 +38,8 @@ WORDS = [
 ]
 
 ROLL_FETCH_LIMIT = 10
+ROOM_PURGE_PERIOD = 15
+ROLL_PURGE_PERIOD = 180
 
 # utility functions
 
@@ -81,13 +83,19 @@ def latest_update(record_list):
 def index(request, room_name=None):
     if not room_name:
         # purge old rooms
-        purge_time = timezone.now() - datetime.timedelta(days=15)
+        purge_time = timezone.now() - datetime.timedelta(days=ROOM_PURGE_PERIOD)
         old_rooms = Room.objects.filter(timestamp__lt=purge_time)
         for old_room in old_rooms:
             Die.objects.filter(owner=old_room.uuid).delete()
             Message.objects.filter(owner=old_room.uuid).delete()
-            Roll.objects.filter(owner=old_room.uuid).delete()
             old_room.delete()
+
+        # purge old rolls
+        purge_time = timezone.now() - datetime.timedelta(days=ROLL_PURGE_PERIOD)
+        old_rolls = Roll.objects.filter(updated__lt=purge_time)
+        for old_roll in old_rolls:
+            Die.objects.filter(owner=old_roll.uuid).delete()
+            old_roll.delete()
 
         # choose new room
         room_chosen = False
