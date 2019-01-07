@@ -150,6 +150,14 @@ h2 {
 	text-align: center;
 }
 
+.about-para {
+	margin: 2px;
+}
+
+.link-without-wrap {
+	white-space: nowrap;
+}
+
 .error-box {
 	text-align: center;
 	font-weight: bold;

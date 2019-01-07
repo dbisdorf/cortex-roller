@@ -390,9 +390,20 @@
 </div>
 
 <div class="about-box">
-Cortexatron (Cortex RPG Die Roller) v0.4 - Send the address of this page to your other players! - 
+<p class="about-para">
+<strong>Cortexatron (Cortex RPG Die Roller) v0.4</strong> -
 <a href="{% static 'players/about.html' %}" target="_blank">About</a> -
 <a href="http://donbisdorf.com" target="_blank">My Blog</a>
+</p>
+<p class="about-para">
+This web page is a Cortexatron "room" that you can share with other players.
+Send the address of this page 
+(<a class="link-without-wrap" href="{{ request.build_absolute_uri }}">{{ request.build_absolute_uri }}</a>) 
+to your fellow players, and you'll all be able to watch each other's dice rolls, in real time.
+If you want a different room, just browse to 
+<a href="../..">the main Cortexatron address</a> 
+and the system will send you to a new room.
+</p>
 </div>
 
 </body>
