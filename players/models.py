@@ -26,7 +26,7 @@ class Die(models.Model):
         return '[{0}] D{1}=X'.format(self.room, self.faces)
 
     def roll(self):
-        self.result = random.randint(1, self.faces)
+        self.result = random.SystemRandom().randint(1, self.faces)
 
 
 class Message(models.Model):

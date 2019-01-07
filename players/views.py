@@ -46,7 +46,7 @@ ROLL_PURGE_PERIOD = 180
 def get_random_words(num_words):
     all = []
     for count in range(num_words):
-        all.append(random.choice(WORDS))
+        all.append(random.SystemRandom().choice(WORDS))
     return ''.join(all)
 
 def get_dice_from_roll(roll_uuid):
@@ -134,7 +134,6 @@ def ajax(request, room_name):
         new_die.save()
 
     elif command == 'rollall':
-        random.seed()
         dice_text_list = []
         dice_list = Die.objects.filter(owner=room.uuid)
         for die in dice_list:
@@ -144,7 +143,6 @@ def ajax(request, room_name):
             die.save()
 
     elif command == 'rolldice':
-        random.seed()
         selected_ids = param.split(',')
         dice_text_list = []
         dice_list = Die.objects.filter(owner=room.uuid, uuid__in=selected_ids)
