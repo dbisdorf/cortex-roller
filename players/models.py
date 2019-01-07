@@ -9,7 +9,7 @@ class Room(models.Model):
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return '[{0}] {1}'.format(self.name, self.timestamp)
+        return '[{0}] {1}'.format(self.name, self.uuid, self.timestamp)
 
 class Die(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -22,8 +22,8 @@ class Die(models.Model):
 
     def __str__(self):
         if self.result:
-            return '[{0}] D{1}={2}'.format(self.room, self.faces, self.result)
-        return '[{0}] D{1}=X'.format(self.room, self.faces)
+            return '[{0}] D{1}={2}'.format(self.owner, self.faces, self.result)
+        return '[{0}] D{1}=X'.format(self.owner, self.faces)
 
     def roll(self):
         self.result = random.SystemRandom().randint(1, self.faces)
@@ -37,7 +37,7 @@ class Message(models.Model):
     owner = models.UUIDField()
 
     def __str__(self):
-        return '[{0}] {1}'.format(self.room, self.text)
+        return '[{0}] {1}'.format(self.owner, self.text)
 
 class Roll(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -46,7 +46,7 @@ class Roll(models.Model):
     owner = models.UUIDField()
 
     def __str__(self):
-        return '[{0}] {1}'.format(self.room, self.text)
+        return '[{0}] {1}'.format(self.owner, self.updated)
 
 
 
