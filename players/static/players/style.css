@@ -1,5 +1,5 @@
 .big-box {
-	width: 900px;
+	max-width: 900px;
 	margin: auto;
 }
 
@@ -20,13 +20,23 @@ h2 {
 
 .button-row {
 	display: table;
-	width: 100%;
+	text-align: center;
+	margin: auto;
 }
 
 .button-group {
 	display: table-cell;
 	padding: 5px;
-	width: 50%;
+	width: 300px;
+}
+
+button {
+	height: 40px;
+	vertical-align: top;
+}
+
+.baseline-button {
+	vertical-align: baseline;
 }
 
 .half-button {
@@ -45,6 +55,7 @@ h2 {
 	display: table;
 	border-collapse: separate;
 	border-spacing: 5px;
+	margin: auto;
 }
 
 .dice-all-centered {
@@ -56,10 +67,10 @@ h2 {
 	text-align: center;
 	border: 1px solid;
 	padding: 5px;
-	width: 70px;
-	display: table-cell;
+	min-width: 70px;
 	background-size: contain;
 	background-repeat: no-repeat;
+	float: left;
 }
 
 .dice-spacer {
@@ -107,22 +118,11 @@ h2 {
 	width: 100%;
 }
 
-.options-box {
-	display: table-cell;
+.bottom-box {
+	min-width: 200px;
+	min-height: 125px;
 	padding: 10px;
-	width: 25%;
-}
-
-.roll-box {
-	display: table-cell;
-	padding: 10px;
-	width: 25%;
-}
-
-.message-box {
-	display: table-cell;
-	padding: 10px;
-	width: 50%;
+	float: left;
 }
 
 .message-row {
@@ -143,7 +143,6 @@ h2 {
 	padding: 5px;
 }
 
-
 .about-box {
 	border: 1px solid;
 	padding: 5px;
@@ -152,10 +151,6 @@ h2 {
 
 .about-para {
 	margin: 2px;
-}
-
-.link-without-wrap {
-	white-space: nowrap;
 }
 
 .error-box {
@@ -184,3 +179,26 @@ h2 {
 	background-image: url('d12.png');
 }
 
+@media (max-width: 920px) {
+	.small-bottom-box {
+		width: 45%;
+	}
+
+	.large-bottom-box {
+		width: 95%;
+	}
+}
+
+@media (max-width: 675px) {
+	.button-group {
+		display: block;
+		width: 100%;
+		max-width: 300px;
+	}
+}
+
+@media (max-width: 500px) {
+	.small-bottom-box {
+		width: 95%;
+	}
+}

@@ -5,6 +5,7 @@
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
 <link rel='stylesheet' type='text/css' href="{% static 'players/style.css' %}" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="{% static 'players/jquery-3.3.1.min.js' %}"></script>
 <script>
 	var dice_updated = "";
@@ -243,13 +244,15 @@
 				$("#dice-row").append("<label for='" + uuid + "'>D" + faces + " is " + description + "</label><input type='checkbox' class='dice-check inline-check' id='" + uuid + "' name='" + uuid + "'>");
 			} else {
 				if (result == 0) {
-					result = '&nbsp;';
+					result = "&nbsp;";
 				}
 				var verbose_tag = '';
 				if (tag == "T") {
 					verbose_tag = "Total";
 				} else if (tag == "E") {
 					verbose_tag = "Effect";
+				} else {
+					verbose_tag = "&nbsp;";
 				}
 				$('#dice-row').append("<div class='dice-box dice-image" + faces + "'><p class='dice-faces'>D" + faces + "</p><p class='dice-result'>" + result + "</p><p class='dice-tag'>" + verbose_tag + "<input type='checkbox' class='dice-check right-check' id='" + uuid + "'></p></div>");
 				if (spacer) {
@@ -263,7 +266,7 @@
 	function draw_messages() {
 		$("#message-table").empty();
 		for (var i = 0; i < message_list.length; i++) {
-			$("#message-table").append("<div class='message-row'><div id='" + message_list[i].uuid + "' class='message-class'>" + message_list[i].text + "</div><div class='message-controls'><button id='del-" + message_list[i].uuid + "' class='del-message'>Remove</button></div></div>");
+			$("#message-table").append("<div class='message-row'><div id='" + message_list[i].uuid + "' class='message-class'>" + message_list[i].text + "</div><div class='message-controls'><button class='baseline-button' id='del-" + message_list[i].uuid + "' class='del-message'>Remove</button></div></div>");
 		}
 	}
 
@@ -301,6 +304,16 @@
 
 <h1>Dice Pool</h1>
 
+<div class='dice-all'>
+<div class='dice-row' id='dice-row' aria-live="polite">
+</div>
+</div>
+
+<div id='roll' class="roll" aria-live="polite"></div>
+<div class="roll">
+<button id='keep-dice'>Keep Results</button>
+</div>
+
 <div class="button-row">
 	<div class="button-group">
 	<h2>Add Dice</h2>
@@ -312,47 +325,34 @@
 	</div>
 
 	<div class="button-group">
-	<h2>Quick Choices</h2>
-	<button id="total-best" class='third-button'>Choose Best Total</button>
-	<button id="effect-best" class='third-button'>Choose Best Effect</button>
-	<button id="tag-none" class='third-button'>Clear Total &amp; Effect</button>
-	</div>
-</div>
-
-<div class="button-row">
-	<div class="button-group">
-	<h2>For Checked Dice</h2>
-	<button id='step-up' class='half-button'>Step Up Checked Dice</button>
-	<button id='step-down' class='half-button'>Step Down Checked Dice</button>
-	<br>
-	<button id='roll-some' class='half-button'>Roll Checked Dice</button>
-	<button id='remove-some' class='half-button'>Remove Checked Dice</button>
-	<br>
-	<button id='total-some' class='half-button'>Checked Dice Are Total</button>
-	<button id='effect-some' class='half-button'>Checked Dice Are Effect</button>
-	</div>
-
-	<div class="button-group">
 	<h2>For All Dice</h2>
 	<button id='roll-all' class='half-button'>Roll All Dice</button>
 	<button id='remove-all' class='half-button'>Remove All Dice</button>
 	</div>
 </div>
 
-<h2>Dice</h2>
-<div class='dice-all'>
-<div class='dice-row' id='dice-row' aria-live="polite">
-</div>
-</div>
+<div class="button-row">
+	<div class="button-group">
+	<h2>Quick Choices</h2>
+	<button id="total-best" class='third-button'>Choose Best Total</button>
+	<button id="effect-best" class='third-button'>Choose Best Effect</button>
+	<button id="tag-none" class='third-button'>Clear Total &amp; Effect</button>
+	</div>
 
-<div id='roll' class="roll" aria-live="polite"></div>
-<div class="roll">
-<button id='keep-dice'>Keep Results</button>
+	<div class="button-group">
+	<h2>For Checked Dice</h2>
+	<button id='step-up' class='half-button'>Step Up Checked Dice</button>
+	<button id='step-down' class='half-button'>Step Down Checked Dice</button>
+	<button id='roll-some' class='half-button'>Roll Checked Dice</button>
+	<button id='remove-some' class='half-button'>Remove Checked Dice</button>
+	<button id='total-some' class='half-button'>Checked Dice Are Total</button>
+	<button id='effect-some' class='half-button'>Checked Dice Are Effect</button>
+	</div>
 </div>
 
 <div class='bottom-info'>
 
-<div class="options-box">
+<div class="bottom-box small-bottom-box">
 <h1>Options</h1>
 <input type="checkbox" id="sort-result" name="sort-result">
 <label for="sort-result">Sort dice by result</label>
@@ -364,13 +364,13 @@
 <label for="text-result">Show dice as text</label>
 </div>
 
-<div class='roll-box'>
+<div class='bottom-box small-bottom-box'>
 <h1>Past Rolls</h1>
 <div id='past-rolls' aria-live="polite"></div>
 <button id="clear-history">Clear History</button>
 </div>
 
-<div class='message-box'>
+<div class='bottom-box large-bottom-box'>
 <h1>Sticky Notes</h1>
 <div id='message-table' aria-live="polite">
 </div>
@@ -391,14 +391,15 @@
 
 <div class="about-box">
 <p class="about-para">
-<strong>Cortexatron (Cortex RPG Die Roller) v0.4</strong> -
+<strong>Cortexatron (Cortex RPG Die Roller) v0.5</strong> -
 <a href="{% static 'players/about.html' %}" target="_blank">About</a> -
-<a href="http://donbisdorf.com" target="_blank">My Blog</a>
+<a href="http://donbisdorf.com" target="_blank">My Blog</a> -
+<a href="{% static 'players/about.html' %}#donate" target="_blank">Donate</a>
 </p>
 <p class="about-para">
 This web page is a Cortexatron "room" that you can share with other players.
 Send the address of this page 
-(<a class="link-without-wrap" href="{{ request.build_absolute_uri }}">{{ request.build_absolute_uri }}</a>) 
+(<a href="{{ request.build_absolute_uri }}">{{ request.build_absolute_uri }}</a>) 
 to your fellow players, and you'll all be able to watch each other's dice rolls, in real time.
 If you want a different room, just browse to 
 <a href="../..">the main Cortexatron address</a> 
