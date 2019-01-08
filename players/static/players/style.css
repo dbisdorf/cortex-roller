@@ -56,6 +56,7 @@ button {
 	border-collapse: separate;
 	border-spacing: 5px;
 	margin: auto;
+	min-height: 100px;
 }
 
 .dice-all-centered {

@@ -24,8 +24,7 @@
 	})();
 
 	$(function() {
-		$('#message-form').on('submit', function(event) {
-			event.preventDefault();
+		$('#post-message').click(function() {
 			ajax_command('message', $('#message-text').val());
 			$('#message-text').val('');
 		});
@@ -266,7 +265,7 @@
 	function draw_messages() {
 		$("#message-table").empty();
 		for (var i = 0; i < message_list.length; i++) {
-			$("#message-table").append("<div class='message-row'><div id='" + message_list[i].uuid + "' class='message-class'>" + message_list[i].text + "</div><div class='message-controls'><button class='baseline-button' id='del-" + message_list[i].uuid + "' class='del-message'>Remove</button></div></div>");
+			$("#message-table").append("<div class='message-row'><div id='" + message_list[i].uuid + "' class='message-class'>" + message_list[i].text + "</div><div class='message-controls'><button class='baseline-button del-message' id='del-" + message_list[i].uuid + "'>Remove</button></div></div>");
 		}
 	}
 
@@ -305,7 +304,7 @@
 <h1>Dice Pool</h1>
 
 <div class='dice-all'>
-<div class='dice-row' id='dice-row' aria-live="polite">
+<div class='dice-row' style="min-height:100px" id='dice-row' aria-live="polite">
 </div>
 </div>
 
@@ -374,13 +373,11 @@
 <h1>Sticky Notes</h1>
 <div id='message-table' aria-live="polite">
 </div>
-<form action='message/' method='POST' id='message-form'>
-	{% csrf_token %}
-	<!-- this no longer needs to be a form -->
-	<label for="message-text">New Note:</label>
-	<input type='text' size='40' name='message-text' id='message-text'/>
-	<input type='submit' value='Post Note' />
-</form>
+
+<label for="message-text">New Note:</label>
+<input type='text' size='40' name='message-text' id='message-text'/>
+<button class="baseline-button" id="post-message">Post Note</button>
+
 </div>
 
 </div>
