@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse
 from django.utils import timezone
-from .models import Die, Message, Roll, Room
+from .models import Die, Message, Roll, Room, Tally
 from django.http import JsonResponse, HttpResponse
 #from PIL import Image, ImageDraw, ImageFont
 import io
@@ -37,11 +37,25 @@ WORDS = [
         'Zebra', 'Zilch', 'Zinc'
 ]
 
+DICE = [4, 6, 8, 10, 12]
+
 ROLL_FETCH_LIMIT = 10
 ROOM_PURGE_PERIOD = 15
 ROLL_PURGE_PERIOD = 180
+RANDOM_REPORT_PERIOD = 14
 
 # utility functions
+
+def roll(die):
+    die.result = random.SystemRandom().randint(1, die.faces)
+    today = datetime.date.today()
+    tally = None
+    try:
+        tally = Tally.objects.get(date=today, faces=die.faces, result=die.result)
+    except Tally.DoesNotExist:
+        tally = Tally(date=today, faces=die.faces, result=die.result)
+    tally.tally += 1
+    tally.save()
 
 def get_random_words(num_words):
     all = []
@@ -137,7 +151,7 @@ def ajax(request, room_name):
         dice_text_list = []
         dice_list = Die.objects.filter(owner=room.uuid)
         for die in dice_list:
-            die.roll()
+            roll(die)
             die.tag = 'X'
             die.updated = timezone.now()
             die.save()
@@ -147,7 +161,7 @@ def ajax(request, room_name):
         dice_text_list = []
         dice_list = Die.objects.filter(owner=room.uuid, uuid__in=selected_ids)
         for die in dice_list:
-            die.roll()
+            roll(die)
             die.tag = 'X'
             die.updated = timezone.now()
             die.save()
@@ -301,4 +315,26 @@ def rolls(request, roll_id):
 
     context = {'timestamp': roll.updated, 'overall': evaluate_dice(dice), 'dice':dice}
     return render(request, 'players/roll.html', context)
+
+def random_report(request):
+    matrix = [[0] * 13 for die in range(len(DICE))]
+    report_start = datetime.date.today() - datetime.timedelta(days=RANDOM_REPORT_PERIOD)
+    tallies = Tally.objects.filter(date__gt=report_start)
+    total_rolls = 0
+    for tally in tallies:
+        index = DICE.index(tally.faces)
+        matrix[index][0] += tally.tally
+        matrix[index][tally.result] += tally.tally
+        total_rolls += tally.tally
+    dice = []
+    index = 0
+    for column in matrix:
+        die = {'faces':DICE[index], 'rolls':column[0], 'tallies':[]}
+        for result in range(1, DICE[index] + 1):
+            tally = {'result': result, 'tally':column[result], 'percent':int(round(column[result]/column[0], 2)*100)}
+            die['tallies'].append(tally)
+        dice.append(die)
+        index += 1
+    context = {'period': RANDOM_REPORT_PERIOD, 'total_rolls': total_rolls, 'dice':dice}
+    return render(request, 'players/random.html', context)
 

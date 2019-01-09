@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>Cortexatron Randomness Report</title>
+{% load static %}
+<link rel='stylesheet' type='text/css' href="{% static 'players/style.css' %}" />
+</head>
+
+<body>
+	<div class="big-box">
+		<h1>Cortexatron Randomness Report</h1>
+		<p>Over the past {{ period }} days, Cortexatron has rolled {{ total_rolls }} individual dice.</p>
+		<div class="report-table">
+			{% for die in dice %}
+			<div class="report-column">
+				<p><strong>D{{ die.faces }}</strong></p>
+				<p>{{ die.rolls }} rolls</p>
+				{% for tally in die.tallies %}
+				[{{ tally.result }}]
+				{{ tally.tally }}x,
+				{{ tally.percent }}%
+				<br>
+				{% endfor %}
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+</body>
+</html>

@@ -213,6 +213,9 @@
 		}
 
 		$('#dice-row').empty();
+		if (dice_list.length == 0) {
+			$("#dice-row").append("<br>no dice");
+		}
 		for (var i = 0; i < dice_list.length; i++) {
 			var uuid = dice_list[i].uuid;
 			var faces = dice_list[i].faces;
@@ -305,6 +308,7 @@
 
 <div class='dice-all'>
 <div class='dice-row' style="min-height:100px" id='dice-row' aria-live="polite">
+<br>no dice
 </div>
 </div>
 

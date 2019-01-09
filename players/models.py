@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-import random
 import uuid
 
 class Room(models.Model):
@@ -25,10 +24,6 @@ class Die(models.Model):
             return '[{0}] D{1}={2}'.format(self.owner, self.faces, self.result)
         return '[{0}] D{1}=X'.format(self.owner, self.faces)
 
-    def roll(self):
-        self.result = random.SystemRandom().randint(1, self.faces)
-
-
 class Message(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     text = models.CharField(max_length=200)
@@ -48,5 +43,12 @@ class Roll(models.Model):
     def __str__(self):
         return '[{0}] {1}'.format(self.owner, self.updated)
 
+class Tally(models.Model):
+    date = models.DateField(auto_now_add=True)
+    faces = models.IntegerField(default=4)
+    result = models.IntegerField(default=0)
+    tally = models.IntegerField(default=0)
 
+    def __str__(self):
+        return '[{0}] D{1}={2} x{3}'.format(self.date, self.faces, self.result, self.tally)
 

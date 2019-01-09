@@ -180,6 +180,16 @@ button {
 	background-image: url('d12.png');
 }
 
+.report-table {
+	display: table;
+}
+
+.report-column {
+	display: table-cell;
+	border: 1px solid;
+	padding: 5px;
+}
+
 @media (max-width: 920px) {
 	.small-bottom-box {
 		width: 45%;
