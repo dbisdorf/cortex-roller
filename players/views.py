@@ -323,7 +323,8 @@ def random_report(request):
         activity = recent_room.timestamp
     matrix = [[0] * 13 for die in range(len(DICE))]
     report_start = datetime.date.today() - datetime.timedelta(days=RANDOM_REPORT_PERIOD)
-    tallies = Tally.objects.filter(date__gt=report_start)
+    Tally.objects.filter(date__lt=report_start).delete()
+    tallies = Tally.objects.all()
     total_rolls = 0
     for tally in tallies:
         index = DICE.index(tally.faces)
