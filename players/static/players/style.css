@@ -121,7 +121,6 @@ button {
 
 .bottom-box {
 	min-width: 200px;
-	min-height: 125px;
 	padding: 10px;
 	float: left;
 }
@@ -208,7 +207,7 @@ button {
 	}
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
 	.small-bottom-box {
 		width: 95%;
 	}

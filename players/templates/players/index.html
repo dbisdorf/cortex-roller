@@ -355,6 +355,20 @@
 
 <div class='bottom-info'>
 
+<div class='bottom-box large-bottom-box'>
+<h1>Past Rolls</h1>
+<div id='past-rolls' aria-live="polite"></div>
+<button id="clear-history">Clear History</button>
+</div>
+
+<div class='bottom-box small-bottom-box'>
+<h1>Sticky Notes</h1>
+<div id='message-table' aria-live="polite"></div>
+<label for="message-text">New Note:</label>
+<input type='text' size='40' name='message-text' id='message-text'/>
+<button class="baseline-button" id="post-message">Post Note</button>
+</div>
+
 <div class="bottom-box small-bottom-box">
 <h1>Options</h1>
 <input type="checkbox" id="sort-result" name="sort-result">
@@ -365,23 +379,6 @@
 <br>
 <input type="checkbox" id="text-result" name="text-result">
 <label for="text-result">Show dice as text</label>
-</div>
-
-<div class='bottom-box small-bottom-box'>
-<h1>Past Rolls</h1>
-<div id='past-rolls' aria-live="polite"></div>
-<button id="clear-history">Clear History</button>
-</div>
-
-<div class='bottom-box large-bottom-box'>
-<h1>Sticky Notes</h1>
-<div id='message-table' aria-live="polite">
-</div>
-
-<label for="message-text">New Note:</label>
-<input type='text' size='40' name='message-text' id='message-text'/>
-<button class="baseline-button" id="post-message">Post Note</button>
-
 </div>
 
 </div>
@@ -400,11 +397,11 @@
 </p>
 <p class="about-para">
 This web page is a Cortexatron "room" that you can share with other players.
-Send the address of this page 
-(<a href="{{ request.build_absolute_uri }}">{{ request.build_absolute_uri }}</a>) 
+Send the address of this page
+(<a href="{{ request.build_absolute_uri }}">{{ request.build_absolute_uri }}</a>)
 to your fellow players, and you'll all be able to watch each other's dice rolls, in real time.
-If you want a different room, just browse to 
-<a href="../..">the main Cortexatron address</a> 
+If you want a different room, just browse to
+<a href="../..">the main Cortexatron address</a>
 and the system will send you to a new room.
 </p>
 </div>
