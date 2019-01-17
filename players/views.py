@@ -298,8 +298,14 @@ def ajax(request, room_name):
     return JsonResponse(response)
 
 def rolls(request, roll_id):
-    roll = Roll.objects.get(uuid=roll_id)
-    dice = Die.objects.filter(owner=roll_id).order_by('-tag', 'faces')
+    context = None
+    try:
+        roll = Roll.objects.get(uuid=roll_id)
+    except Roll.DoesNotExist:
+        context = {'timestamp': 'not found', 'overall': 'There is no valid dice roll information at this address.', 'dice': None}
+    if not context:
+        dice = Die.objects.filter(owner=roll_id).order_by('-tag', 'faces')
+        context = {'timestamp': roll.updated, 'overall': evaluate_dice(dice), 'dice':dice}
 
     '''
     image = Image.new('RGB', (640, 160), (255, 255, 255))
@@ -313,7 +319,6 @@ def rolls(request, roll_id):
     return response
     '''
 
-    context = {'timestamp': roll.updated, 'overall': evaluate_dice(dice), 'dice':dice}
     return render(request, 'players/roll.html', context)
 
 def random_report(request):
