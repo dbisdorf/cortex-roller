@@ -317,6 +317,10 @@ def rolls(request, roll_id):
     return render(request, 'players/roll.html', context)
 
 def random_report(request):
+    activity = None
+    recent_room = Room.objects.order_by('-timestamp').first()
+    if recent_room:
+        activity = recent_room.timestamp
     matrix = [[0] * 13 for die in range(len(DICE))]
     report_start = datetime.date.today() - datetime.timedelta(days=RANDOM_REPORT_PERIOD)
     tallies = Tally.objects.filter(date__gt=report_start)
@@ -335,6 +339,5 @@ def random_report(request):
             die['tallies'].append(tally)
         dice.append(die)
         index += 1
-    context = {'period': RANDOM_REPORT_PERIOD, 'total_rolls': total_rolls, 'dice':dice}
+    context = {'period': RANDOM_REPORT_PERIOD, 'total_rolls': total_rolls, 'activity': activity, 'dice':dice}
     return render(request, 'players/random.html', context)
-

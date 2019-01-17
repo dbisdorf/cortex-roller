@@ -8,7 +8,11 @@
 <body>
 	<div class="big-box">
 		<h1>Cortexatron Randomness Report</h1>
-		<p>Over the past {{ period }} days, Cortexatron has rolled {{ total_rolls }} individual dice.</p>
+		<p>Over the past {{ period }} days, Cortexatron has rolled {{ total_rolls }} individual dice.
+		{% if activity %}
+		The most recent player action occurred at {{ activity }}.
+		{% endif %}
+		</p>
 		<p>The chart below shows, for each die type: the number of times players rolled that die,
 		the number of times each die face came up, and what percentage of the time each die face came up.</p>
 		<div class="report-table">
