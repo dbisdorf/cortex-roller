@@ -96,21 +96,6 @@ def latest_update(record_list):
 
 def index(request, room_name=None):
     if not room_name:
-        # purge old rooms
-        purge_time = timezone.now() - datetime.timedelta(days=ROOM_PURGE_PERIOD)
-        old_rooms = Room.objects.filter(timestamp__lt=purge_time)
-        for old_room in old_rooms:
-            Die.objects.filter(owner=old_room.uuid).delete()
-            Message.objects.filter(owner=old_room.uuid).delete()
-            old_room.delete()
-
-        # purge old rolls
-        purge_time = timezone.now() - datetime.timedelta(days=ROLL_PURGE_PERIOD)
-        old_rolls = Roll.objects.filter(updated__lt=purge_time)
-        for old_roll in old_rolls:
-            Die.objects.filter(owner=old_roll.uuid).delete()
-            old_roll.delete()
-
         # choose new room
         room_chosen = False
         while not room_chosen:
@@ -327,8 +312,7 @@ def random_report(request):
     if recent_room:
         activity = recent_room.timestamp
     matrix = [[0] * 13 for die in range(len(DICE))]
-    report_start = datetime.date.today() - datetime.timedelta(days=RANDOM_REPORT_PERIOD)
-    Tally.objects.filter(date__lt=report_start).delete()
+
     tallies = Tally.objects.all()
     total_rolls = 0
     for tally in tallies:
@@ -347,3 +331,56 @@ def random_report(request):
         index += 1
     context = {'period': RANDOM_REPORT_PERIOD, 'total_rolls': total_rolls, 'activity': activity, 'dice':dice}
     return render(request, 'players/random.html', context)
+
+def purge(request):
+    # purge old rooms
+    purge_time = timezone.now() - datetime.timedelta(days=ROOM_PURGE_PERIOD)
+    old_rooms = Room.objects.filter(timestamp__lt=purge_time)
+    for old_room in old_rooms:
+        Die.objects.filter(owner=old_room.uuid).delete()
+        Message.objects.filter(owner=old_room.uuid).delete()
+        old_room.delete()
+
+    # purge old rolls
+    purge_time = timezone.now() - datetime.timedelta(days=ROLL_PURGE_PERIOD)
+    old_rolls = Roll.objects.filter(updated__lt=purge_time)
+    for old_roll in old_rolls:
+        Die.objects.filter(owner=old_roll.uuid).delete()
+        old_roll.delete()
+
+    # purge old tallies
+    report_start = datetime.date.today() - datetime.timedelta(days=RANDOM_REPORT_PERIOD)
+    Tally.objects.filter(date__lt=report_start).delete()
+
+    # purge orphan dice
+    offset = 0
+    limit = 10
+    purging = True
+    while purging:
+        dice = Die.objects.all()[offset:limit]
+        if dice:
+            for die in dice:
+                if not Room.objects.filter(uuid=die.owner).exists() and not Roll.objects.filter(uuid=die.owner).exists():
+                    die.delete()
+            offset += 10
+            limit += 10
+        else:
+            purging = False
+
+    # purge orphan stickies
+    offset = 0
+    limit = 10
+    purging = True
+    while purging:
+        messages = Message.objects.all()[offset:limit]
+        if messages:
+            for message in messages:
+                if not Room.objects.filter(uuid=message.owner).exists():
+                    message.delete()
+            offset += 10
+            limit += 10
+        else:
+            purging = False
+
+    response = HttpResponse('Purge complete.')
+    return response
