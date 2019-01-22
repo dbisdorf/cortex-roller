@@ -29,6 +29,13 @@
 			$('#message-text').val('');
 		});
 
+		$("#message-text").keyup(function() {
+			if (event.keyCode === 13) {
+				ajax_command('message', $('#message-text').val());
+				$('#message-text').val('');
+			}
+		})
+
 		$('#d4-add').click(function() {
 			ajax_command('adddie', 4);
 		});
