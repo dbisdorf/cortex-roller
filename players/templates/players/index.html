@@ -29,7 +29,7 @@
 			$('#message-text').val('');
 		});
 
-		$("#message-text").keyup(function() {
+		$("#message-text").keyup(function(event) {
 			if (event.keyCode === 13) {
 				ajax_command('message', $('#message-text').val());
 				$('#message-text').val('');
