@@ -75,8 +75,9 @@ button {
 }
 
 .dice-spacer {
-	display: table-cell;
 	width: 20px;
+	height: 100px;
+	float: left;
 }
 
 .dice-check {
