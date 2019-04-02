@@ -211,6 +211,17 @@ def ajax(request, room_name):
                 die.updated = timezone.now()
             die.save()
 
+    elif command == 'rotatedie':
+        die = Die.objects.get(uuid=param)
+        if die.tag == 'X':
+            die.tag = 'T'
+        elif die.tag == 'T':
+            die.tag = 'E'
+        else:
+            die.tag = 'X'
+        die.updated = timezone.now()
+        die.save()
+
     elif command == 'tagnone':
         dice_list = Die.objects.filter(owner=room.uuid)
         for die in dice_list:

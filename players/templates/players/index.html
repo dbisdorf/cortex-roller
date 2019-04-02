@@ -120,6 +120,7 @@
 			draw_dice();
 		});
 
+
 		/*
 		$(document).on("click", ".dice-check", function() {
 			ajax_command("toggledie", $( this ).attr('id'));
@@ -131,6 +132,13 @@
 			$("#message-text").val( $("#" + message_id).text() );
 			ajax_command("delmessage", message_id);
 		});
+
+		$(document).on("click", ".dice-result", function() {
+			var message_id = $( this ).attr("id").substring(4);
+			$("#message-text").val( $("#" + message_id).text() );
+			ajax_command("rotatedie", message_id);
+		});
+
 	});
 
 	function ajax_command(in_command, in_param) {
@@ -263,7 +271,7 @@
 				} else {
 					verbose_tag = "&nbsp;";
 				}
-				$('#dice-row').append("<div class='dice-box dice-image" + faces + "'><p class='dice-faces'>D" + faces + "</p><p class='dice-result'>" + result + "</p><p class='dice-tag'>" + verbose_tag + "<input type='checkbox' class='dice-check right-check' id='" + uuid + "'></p></div>");
+				$('#dice-row').append("<div class='dice-box dice-image" + faces + "'><p class='dice-faces'>D" + faces + "</p><p class='dice-result' id='rot-" + uuid + "'>" + result + "</p><p class='dice-tag'>" + verbose_tag + "<input type='checkbox' class='dice-check right-check' id='" + uuid + "'></p></div>");
 				if (spacer) {
 					$("#dice-row").append("<div class='dice-spacer'></div>");
 				}
@@ -396,7 +404,7 @@
 
 <div class="about-box">
 <p class="about-para">
-<strong>Cortexatron (Cortex RPG Die Roller) v0.7</strong> -
+<strong>Cortexatron (Cortex RPG Die Roller) v1.0</strong> -
 <a href="{% static 'players/about.html' %}" target="_blank">About</a> -
 <a href="../random" target="_blank">Randomness</a> -
 <a href="http://donbisdorf.com" target="_blank">My Blog</a> -
