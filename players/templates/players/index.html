@@ -4,7 +4,7 @@
 
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
-<link rel='stylesheet' type='text/css' href="{% static 'players/style-070.css' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'players/style-100.css' %}" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="{% static 'players/jquery-3.3.1.min.js' %}"></script>
 <script>
@@ -120,6 +120,9 @@
 			draw_dice();
 		});
 
+		$("#one-click-mode").click(function() {
+			draw_check_behavior();
+		})
 
 		/*
 		$(document).on("click", ".dice-check", function() {
@@ -133,10 +136,25 @@
 			ajax_command("delmessage", message_id);
 		});
 
-		$(document).on("click", ".dice-result", function() {
-			var message_id = $( this ).attr("id").substring(4);
-			$("#message-text").val( $("#" + message_id).text() );
-			ajax_command("rotatedie", message_id);
+		$(document).on("click", ".dice-check", function() {
+			if ($("#one-click-mode").is(":checked")) {
+				var die_id = $( this ).attr("id");
+				if ($("#behave-rotate").is(":checked")) {
+					ajax_command("rotatedie", die_id);
+				} else if ($("#behave-up").is(":checked")) {
+					ajax_command("updice", die_id);
+				} else if ($("#behave-back").is(":checked")) {
+					ajax_command("downdice", die_id);
+				} else if ($("#behave-roll").is(":checked")) {
+					ajax_command("rolldice", die_id);
+				} else if ($("#behave-remove").is(":checked")) {
+					ajax_command("deldice", die_id);
+				}
+			}
+		});
+
+		$(document).ready(function() {
+    	draw_check_behavior();
 		});
 
 	});
@@ -271,7 +289,7 @@
 				} else {
 					verbose_tag = "&nbsp;";
 				}
-				$('#dice-row').append("<div class='dice-box dice-image" + faces + "'><p class='dice-faces'>D" + faces + "</p><p class='dice-result' id='rot-" + uuid + "'>" + result + "</p><p class='dice-tag'>" + verbose_tag + "<input type='checkbox' class='dice-check right-check' id='" + uuid + "'></p></div>");
+				$('#dice-row').append("<div class='dice-box dice-image" + faces + "'><p class='dice-faces'>D" + faces + "</p><p class='dice-result'>" + result + "</p><p class='dice-tag'>" + verbose_tag + "<input type='checkbox' class='dice-check right-check' id='" + uuid + "'></p></div>");
 				if (spacer) {
 					$("#dice-row").append("<div class='dice-spacer'></div>");
 				}
@@ -310,6 +328,35 @@
 			ids.push($( this ).attr("id"));
 		});
 		return ids.join(",");
+	}
+
+	function draw_check_behavior() {
+		$('#check-behavior').empty();
+		if ($("#one-click-mode").is(":checked")) {
+			$("#check-behavior").append(
+				"<div class='radio-group'> \
+				<input type='radio' id='behave-rotate' name='behave' value='behave-rotate' checked> \
+				<label for='behave-rotate'>Rotate between total/effect/unmarked</label><br> \
+				<input type='radio' id='behave-up' name='behave' value='behave-up'> \
+				<label for='behave-up'>Step up</label><br> \
+				<input type='radio' id='behave-back' name='behave' value='behave-back'> \
+				<label for='behave-back'>Step back</label><br> \
+				<input type='radio' id='behave-roll' name='behave' value='behave-roll'> \
+				<label for='behave-roll'>Roll</label><br> \
+				<input type='radio' id='behave-remove' name='behave' value='behave-remove'> \
+				<label for='behave-remove'>Remove</label> \
+				</div>"
+			);
+		} else {
+			$("#check-behavior").append(
+				"<button id='step-up' class='half-button'>Step Up Checked Dice</button> \
+				<button id='step-down' class='half-button'>Step Down Checked Dice</button> \
+				<button id='roll-some' class='half-button'>Roll Checked Dice</button> \
+				<button id='remove-some' class='half-button'>Remove Checked Dice</button> \
+				<button id='total-some' class='half-button'>Checked Dice Are Total</button> \
+				<button id='effect-some' class='half-button'>Checked Dice Are Effect</button>"
+			);
+		}
 	}
 
 </script>
@@ -359,12 +406,8 @@
 
 	<div class="button-group">
 	<h2>For Checked Dice</h2>
-	<button id='step-up' class='half-button'>Step Up Checked Dice</button>
-	<button id='step-down' class='half-button'>Step Down Checked Dice</button>
-	<button id='roll-some' class='half-button'>Roll Checked Dice</button>
-	<button id='remove-some' class='half-button'>Remove Checked Dice</button>
-	<button id='total-some' class='half-button'>Checked Dice Are Total</button>
-	<button id='effect-some' class='half-button'>Checked Dice Are Effect</button>
+	<div id="check-behavior">
+	</div>
 	</div>
 </div>
 
@@ -380,7 +423,7 @@
 <h1>Sticky Notes</h1>
 <div id='message-table' aria-live="polite"></div>
 <label for="message-text">New Note:</label>
-<input type='text' size='35' name='message-text' id='message-text'/>
+<input type='text' size='30' name='message-text' id='message-text'/>
 <button class="baseline-button" id="post-message">Post Note</button>
 </div>
 
@@ -394,6 +437,9 @@
 <br>
 <input type="checkbox" id="text-result" name="text-result">
 <label for="text-result">Show dice as text</label>
+<br>
+<input type="checkbox" id="one-click-mode" name="one-click-mode">
+<label for="one-click-mode">One-click mode for dice checkboxes</label>
 </div>
 
 </div>
