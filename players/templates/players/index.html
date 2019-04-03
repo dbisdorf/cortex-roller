@@ -64,20 +64,8 @@
 			ajax_command('delall', 0);
 		});
 
-		$('#remove-some').click(function() {
-			ajax_command('deldice', checked_dice_ids());
-		});
-
 		$("#keep-dice").click(function() {
 			ajax_command('keep', 0);
-		});
-
-		$("#total-some").click(function() {
-			ajax_command('totaldice', checked_dice_ids());
-		});
-
-		$("#effect-some").click(function() {
-			ajax_command("effectdice", checked_dice_ids());
 		});
 
 		$("#clear-history").click(function() {
@@ -96,18 +84,6 @@
 			ajax_command("tagnone", 0);
 		});
 
-		$("#step-up").click(function() {
-			ajax_command("updice", checked_dice_ids());
-		});
-
-		$("#step-down").click(function() {
-			ajax_command("downdice", checked_dice_ids());
-		});
-
-		$("#roll-some").click(function() {
-			ajax_command('rolldice', checked_dice_ids());
-		});
-
 		$("#sort-result").click(function() {
 			draw_dice();
 		});
@@ -123,12 +99,6 @@
 		$("#one-click-mode").click(function() {
 			draw_check_behavior();
 		})
-
-		/*
-		$(document).on("click", ".dice-check", function() {
-			ajax_command("toggledie", $( this ).attr('id'));
-		});
-		*/
 
 		$(document).on("click", ".del-message", function() {
 			var message_id = $( this ).attr("id").substring(4);
@@ -151,6 +121,30 @@
 					ajax_command("deldice", die_id);
 				}
 			}
+		});
+
+		$(document).on("click", "#total-some", function() {
+			ajax_command('totaldice', checked_dice_ids());
+		});
+
+		$(document).on("click", "#effect-some", function() {
+			ajax_command("effectdice", checked_dice_ids());
+		});
+
+		$(document).on("click", "#step-up", function() {
+			ajax_command("updice", checked_dice_ids());
+		});
+
+		$(document).on("click", "#step-down", function() {
+			ajax_command("downdice", checked_dice_ids());
+		});
+
+		$(document).on("click", "#roll-some", function() {
+			ajax_command('rolldice', checked_dice_ids());
+		});
+
+		$(document).on("click", "#remove-some", function() {
+			ajax_command('deldice', checked_dice_ids());
 		});
 
 		$(document).ready(function() {
