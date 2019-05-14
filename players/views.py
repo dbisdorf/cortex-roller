@@ -107,6 +107,9 @@ def index(request, room_name=None):
         new_room = Room(name=new_room_name)
         new_room.save()
         return redirect(reverse('index') + new_room_name + '/')
+    else:
+        if not Room.objects.filter(name=room_name).exists():
+            return HttpResponse('This is not a valid room. Please <a href="..">click here</a> and the system will assign you a new room.')
 
     return render(request, 'players/index.html', {})
 
