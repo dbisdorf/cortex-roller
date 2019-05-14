@@ -338,7 +338,10 @@ def random_report(request):
     for column in matrix:
         die = {'faces':DICE[index], 'rolls':column[0], 'tallies':[]}
         for result in range(1, DICE[index] + 1):
-            tally = {'result': result, 'tally':column[result], 'percent':int(round(column[result]/column[0], 2)*100)}
+            percent = 0
+            if column[0] > 0:
+                percent = int(round(column[result]/column[0], 2) * 100)
+            tally = {'result': result, 'tally':column[result], 'percent':percent}
             die['tallies'].append(tally)
         dice.append(die)
         index += 1
