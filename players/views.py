@@ -345,6 +345,10 @@ def random_report(request):
     context = {'period': RANDOM_REPORT_PERIOD, 'total_rolls': total_rolls, 'activity': activity, 'dice':dice}
     return render(request, 'players/random.html', context)
 
+def about(request):
+    context = {'room_purge': ROOM_PURGE_PERIOD, 'roll_purge': ROLL_PURGE_PERIOD}
+    return render(request, 'players/about.html', context)
+
 def purge(request):
     # purge old rooms
     purge_time = timezone.now() - datetime.timedelta(days=ROOM_PURGE_PERIOD)
