@@ -113,7 +113,7 @@
 					ajax_command("rotatedie", die_id);
 				} else if ($("#behave-up").is(":checked")) {
 					ajax_command("updice", die_id);
-				} else if ($("#behave-back").is(":checked")) {
+				} else if ($("#behave-down").is(":checked")) {
 					ajax_command("downdice", die_id);
 				} else if ($("#behave-roll").is(":checked")) {
 					ajax_command("rolldice", die_id);
@@ -333,8 +333,8 @@
 				<label for='behave-rotate'>Rotate between total/effect/unmarked</label><br> \
 				<input type='radio' id='behave-up' name='behave' value='behave-up'> \
 				<label for='behave-up'>Step up</label><br> \
-				<input type='radio' id='behave-back' name='behave' value='behave-back'> \
-				<label for='behave-back'>Step back</label><br> \
+				<input type='radio' id='behave-down' name='behave' value='behave-down'> \
+				<label for='behave-down'>Step down</label><br> \
 				<input type='radio' id='behave-roll' name='behave' value='behave-roll'> \
 				<label for='behave-roll'>Roll</label><br> \
 				<input type='radio' id='behave-remove' name='behave' value='behave-remove'> \
@@ -344,7 +344,7 @@
 		} else {
 			$("#check-behavior").append(
 				"<button id='step-up' class='half-button'>Step Up Checked Dice</button> \
-				<button id='step-down' class='half-button'>Step Back Checked Dice</button> \
+				<button id='step-down' class='half-button'>Step Down Checked Dice</button> \
 				<button id='roll-some' class='half-button'>Roll Checked Dice</button> \
 				<button id='remove-some' class='half-button'>Remove Checked Dice</button> \
 				<button id='total-some' class='half-button'>Checked Dice Are Total</button> \
