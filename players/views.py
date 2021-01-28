@@ -132,8 +132,11 @@ def ajax(request, room_name):
         Message.objects.filter(uuid=param).delete()
 
     elif command == 'adddie':
-        new_die = Die(owner=room.uuid, faces=param)
-        new_die.save()
+        if int(param) in DICE:
+            new_die = Die(owner=room.uuid, faces=param)
+            new_die.save()
+        else:
+            valid_command = False
 
     elif command == 'rollall':
         dice_text_list = []
