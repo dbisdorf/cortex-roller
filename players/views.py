@@ -191,30 +191,14 @@ def ajax(request, room_name):
             die.save()
 
     elif command == 'totalbest':
-        marked = 0
-        dice_list = Die.objects.filter(owner=room.uuid).order_by('-result', 'faces')
-        for die in dice_list:
-            if die.result > 1 and marked < 2 and die.tag != 'E':
-                die.tag = 'T'
-                die.updated = timezone.now()
-                marked += 1
-            elif die.tag == 'T':
-                die.tag = 'X'
-                die.updated = timezone.now()
-            die.save()
+        choose_none(room)
+        choose_best_total(room)
+        choose_best_effect(room)
 
     elif command == 'effectbest':
-        marked = 0
-        dice_list = Die.objects.filter(owner=room.uuid).order_by('-faces', 'result')
-        for die in dice_list:
-            if die.result > 1 and marked < 1 and die.tag != 'T':
-                die.tag = 'E'
-                die.updated = timezone.now()
-                marked += 1
-            elif die.tag == 'E':
-                die.tag = 'X'
-                die.updated = timezone.now()
-            die.save()
+        choose_none(room)
+        choose_best_effect(room)
+        choose_best_total(room)
 
     elif command == 'rotatedie':
         die = Die.objects.get(uuid=param)
@@ -228,12 +212,7 @@ def ajax(request, room_name):
         die.save()
 
     elif command == 'tagnone':
-        dice_list = Die.objects.filter(owner=room.uuid)
-        for die in dice_list:
-            if die.tag != 'X':
-                die.tag = 'X'
-                die.updated = timezone.now()
-                die.save()
+        choose_none(room)
 
     elif command == 'keep':
         new_roll = Roll(owner=room.uuid)
@@ -321,6 +300,40 @@ def rolls(request, roll_id):
     '''
 
     return render(request, 'players/roll.html', context)
+
+def choose_best_total(room):
+    marked = 0
+    dice_list = Die.objects.filter(owner=room.uuid).order_by('-result', 'faces')
+    for die in dice_list:
+        if die.result > 1 and marked < 2 and die.tag != 'E':
+            die.tag = 'T'
+            die.updated = timezone.now()
+            marked += 1
+        elif die.tag == 'T':
+            die.tag = 'X'
+            die.updated = timezone.now()
+        die.save()
+
+def choose_best_effect(room):
+    marked = 0
+    dice_list = Die.objects.filter(owner=room.uuid).order_by('-faces', 'result')
+    for die in dice_list:
+        if die.result > 1 and marked < 1 and die.tag != 'T':
+            die.tag = 'E'
+            die.updated = timezone.now()
+            marked += 1
+        elif die.tag == 'E':
+            die.tag = 'X'
+            die.updated = timezone.now()
+        die.save()
+
+def choose_none(room):
+    dice_list = Die.objects.filter(owner=room.uuid)
+    for die in dice_list:
+        if die.tag != 'X':
+            die.tag = 'X'
+            die.updated = timezone.now()
+            die.save()
 
 def random_report(request):
     activity = None
