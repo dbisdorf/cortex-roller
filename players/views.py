@@ -183,7 +183,8 @@ def ajax(request, room_name):
         dice_list = Die.objects.filter(owner=room.uuid)
         for die in dice_list:
             if str(die.uuid) in selected_ids:
-                die.tag = 'E'
+                if die.result > 1:
+                    die.tag = 'E'
                 die.updated = timezone.now()
             elif die.tag == 'E':
                 die.tag = 'X'
