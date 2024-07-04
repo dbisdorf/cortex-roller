@@ -52,3 +52,14 @@ class Tally(models.Model):
     def __str__(self):
         return '[{0}] D{1}={2} x{3}'.format(self.date, self.faces, self.result, self.tally)
 
+class Notation(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    purpose = models.CharField(max_length=10)
+    text = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(default=timezone.now)
+    owner = models.UUIDField()
+
+    def _str__(self):
+        return '[{0}] {1}={2}'.format(self.owner, self.purpose, self.text)
+

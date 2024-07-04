@@ -100,6 +100,10 @@
 			draw_check_behavior();
 		})
 
+		$("#roll-notations").click(function() {
+			toggle_notation_fields();
+		})
+
 		$(document).on("click", ".del-message", function() {
 			var message_id = $( this ).attr("id").substring(4);
 			$("#message-text").val( $("#" + message_id).text() );
@@ -353,6 +357,14 @@
 		}
 	}
 
+	function toggle_notation_fields() {
+		if ($("#roll-notations").is(":checked")) {
+			$("#notation-fields").css("display", "table");
+		} else {
+			$("#notation-fields").css("display", "none");
+		}
+	}
+
 </script>
 
 </head>
@@ -369,7 +381,19 @@
 </div>
 
 <div id='roll' class="roll" aria-live="polite"></div>
-<div class="roll">
+<div style="text-align:center;max-width:500px;margin:auto">
+
+<div id="notation-fields" style="display:none;width:100%;text-align:left" hidden>
+	<div style="display:table-row;">
+	<label style="display:table-cell;text-align:right" for="player-notation">Player:</label>
+	<input style="display:table-cell;width:100%" type="text" name="player-notation" id="player-notation">
+	</div>
+	<div style="display:table-row;">
+	<label style="display:table-cell;text-align:right" for="remarks-notation">Remarks:</label>
+	<input style="display:table-cell;width:100%" type="text" name="remarks-notation" id="remarks-notation">
+	</div>
+</div>
+
 <button id='keep-dice'>Keep Results</button>
 </div>
 
@@ -435,6 +459,9 @@
 <br>
 <input type="checkbox" id="one-click-mode" name="one-click-mode">
 <label for="one-click-mode">One-click mode for dice checkboxes</label>
+<br>
+<input type="checkbox" id="roll-notations" name="roll-notations">
+<label for="roll-notations">Allow remarks for kept rolls</label>
 </div>
 
 </div>
@@ -445,7 +472,7 @@
 
 <div class="about-box">
 <p class="about-para">
-<strong>Cortexatron (Cortex RPG Die Roller) v1.05</strong> -
+<strong>Cortexatron (Cortex RPG Die Roller) v1.1</strong> -
 <a href="../about" target="_blank">About</a> -
 <a href="../random" target="_blank">Randomness</a> -
 <a href="http://donbisdorf.com" target="_blank">My Blog</a> -
