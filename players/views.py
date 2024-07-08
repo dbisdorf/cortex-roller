@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse
 from django.utils import timezone
-from .models import Die, Message, Roll, Room, Tally
+from .models import Die, Message, Roll, Room, Tally, Notation
 from django.http import JsonResponse, HttpResponse
 #from PIL import Image, ImageDraw, ImageFont
 import io
@@ -85,6 +85,14 @@ def evaluate_dice(dice_list):
         else:
             effect = 'None'
     return 'Total: {0} - Effect: {1}'.format(total, effect)
+
+def format_notations(notation_list):
+    formatted = []
+    for notation in notation_list:
+        formatted.append('{0}: {1}'.format(notation.purpose, notation.text))
+    if formatted:
+        return ' - ' + ' - '.join(formatted)
+    return ''
 
 def latest_update(record_list):
     if not record_list:
@@ -222,6 +230,11 @@ def ajax(request, room_name):
         for die in dice_list:
             copy_die = Die(faces=die.faces, result=die.result, tag=die.tag, owner=new_roll.uuid)
             copy_die.save()
+        if param:
+            notations = param.split('|')
+            for n in range(0, len(notations), 2):
+                new_notation = Notation(owner=new_roll.uuid, purpose=notations[n], text=notations[n+1])
+                new_notation.save()
 
     elif command == 'updice':
         selected_ids = param.split(',')
@@ -268,7 +281,7 @@ def ajax(request, room_name):
         response['dice_update'] = latest_update(dice_list)
 
         roll_list = Roll.objects.filter(owner=room.uuid).order_by('-created')[:ROLL_FETCH_LIMIT]
-        roll_text_list = [{'uuid':r.uuid, 'text':evaluate_dice(Die.objects.filter(owner=r.uuid).order_by('faces'))} for r in roll_list]
+        roll_text_list = [{'uuid':r.uuid, 'text':evaluate_dice(Die.objects.filter(owner=r.uuid).order_by('faces'))+format_notations(Notation.objects.filter(owner=r.uuid).order_by('purpose'))} for r in roll_list]
         response['roll_list'] = roll_text_list
         response['roll_update'] = latest_update(roll_list)
 

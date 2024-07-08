@@ -65,7 +65,19 @@
 		});
 
 		$("#keep-dice").click(function() {
-			ajax_command('keep', 0);
+			var player_notation = $("#player-notation").val().replace("|", "").trim();
+			var remarks_notation = $("#remarks-notation").val().replace("|", "").trim();
+			var notations = [];
+			if (player_notation !== "") {
+				notations.push("Player");
+				notations.push(player_notation);
+			}
+			if (remarks_notation !== "") {
+				notations.push("Remarks");
+				notations.push(remarks_notation);
+			}
+			ajax_command('keep', notations.join("|"));
+			$("#remarks-notation").val('');
 		});
 
 		$("#clear-history").click(function() {
@@ -381,19 +393,20 @@
 </div>
 
 <div id='roll' class="roll" aria-live="polite"></div>
-<div style="text-align:center;max-width:500px;margin:auto">
 
+<div style="text-align:center;max-width:500px;margin:auto">
 <div id="notation-fields" style="display:none;width:100%;text-align:left" hidden>
+	<div style="display:table-column;width:min-content;"></div>
+	<div style="display:table-column;width:100%"></div>
 	<div style="display:table-row;">
-	<label style="display:table-cell;text-align:right" for="player-notation">Player:</label>
-	<input style="display:table-cell;width:100%" type="text" name="player-notation" id="player-notation">
+	<label style="display:table-cell;text-align:right;" for="player-notation">Player:</label>
+	<input style="display:table-cell;width:100%" type="text" size=200 name="player-notation" id="player-notation">
 	</div>
 	<div style="display:table-row;">
-	<label style="display:table-cell;text-align:right" for="remarks-notation">Remarks:</label>
-	<input style="display:table-cell;width:100%" type="text" name="remarks-notation" id="remarks-notation">
+	<label style="display:table-cell;text-align:right;" for="remarks-notation">Remarks:</label>
+	<input style="display:table-cell;width:100%" type="text" size=200 name="remarks-notation" id="remarks-notation">
 	</div>
 </div>
-
 <button id='keep-dice'>Keep Results</button>
 </div>
 
