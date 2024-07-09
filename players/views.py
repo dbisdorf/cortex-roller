@@ -89,7 +89,7 @@ def evaluate_dice(dice_list):
 def format_notations(notation_list):
     formatted = []
     for notation in notation_list:
-        formatted.append('{0}: {1}'.format(notation.purpose, notation.text))
+        formatted.append(notation.text)
     if formatted:
         return ' - ' + ' - '.join(formatted)
     return ''
@@ -299,7 +299,8 @@ def rolls(request, roll_id):
         context = {'timestamp': 'not found', 'overall': 'There is no valid dice roll information at this address.', 'dice': None}
     if not context:
         dice = Die.objects.filter(owner=roll_id).order_by('-tag', 'faces')
-        context = {'timestamp': roll.updated, 'overall': evaluate_dice(dice), 'dice':dice}
+        notations = Notation.objects.filter(owner=roll_id).order_by('purpose')
+        context = {'timestamp': roll.updated, 'overall': evaluate_dice(dice), 'dice':dice, 'notations': notations}
 
     '''
     image = Image.new('RGB', (640, 160), (255, 255, 255))

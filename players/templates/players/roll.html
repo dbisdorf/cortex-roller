@@ -8,6 +8,7 @@
 <body>
 	<div class="big-box">
 		<h1>Cortexatron Dice Roll: {{ timestamp }}</h1>
+
 		<div class="dice-all-centered">
 			{% for die in dice %}
 			<div class='dice-box dice-image{{ die.faces }}'>
@@ -23,7 +24,13 @@
 			</div>
 			{% endfor %}
 		</div>
-		<p class="roll">{{ overall }}</p>
+
+		<p class="roll">
+		{{ overall }}
+		{% for notation in notations %}
+		<br/>{{ notation.purpose }}: {{ notation.text }}
+		{% endfor %}
+		</p>
 	</div>
 </body>
 </html>
