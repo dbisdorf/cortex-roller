@@ -433,5 +433,20 @@ def purge(request):
         else:
             purging = False
 
+    # purge orphan notations
+    offset = 0
+    limit = 10
+    purging = True
+    while purging:
+        notations = Notation.objects.all()[offset:limit]
+        if notations:
+            for notation in notations:
+                if not Room.objects.filter(uuid=notation.owner).exists():
+                    notation.delete()
+            offset += 10
+            limit += 10
+        else:
+            purging = False
+
     response = HttpResponse('Purge complete.')
     return response
