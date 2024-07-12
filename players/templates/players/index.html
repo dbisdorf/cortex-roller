@@ -4,7 +4,7 @@
 
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
-<link rel='stylesheet' type='text/css' href="{% static 'players/style-103.css' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'players/style-104.css' %}" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="{% static 'players/jquery-3.7.1.min.js' %}"></script>
 <script>
@@ -394,17 +394,17 @@
 
 <div id='roll' class="roll" aria-live="polite"></div>
 
-<div style="text-align:center;max-width:500px;margin:auto">
-<div id="notation-fields" style="display:none;width:100%;text-align:left" hidden>
-	<div style="display:table-column;width:min-content;"></div>
-	<div style="display:table-column;width:100%"></div>
-	<div style="display:table-row;">
-	<label style="display:table-cell;text-align:right;" for="player-notation">Player:</label>
-	<input style="display:table-cell;width:100%" type="text" size=200 name="player-notation" id="player-notation">
+<div class='roll-keep-box'>
+<div id="notation-fields" class='notation-box'>
+	<div class='notation-left-col'></div>
+	<div class='notation-right-col'></div>
+	<div class='notation-row'>
+	<label class='notation-label' for="player-notation">Player:</label>
+	<input class='notation-input' type="text" maxlength=200 name="player-notation" id="player-notation">
 	</div>
-	<div style="display:table-row;">
-	<label style="display:table-cell;text-align:right;" for="remarks-notation">Remarks:</label>
-	<input style="display:table-cell;width:100%" type="text" size=200 name="remarks-notation" id="remarks-notation">
+	<div class='notation-row'>
+	<label class='notation-label' for="remarks-notation">Remarks:</label>
+	<input class='notation-input' type="text" maxlength=200 name="remarks-notation" id="remarks-notation">
 	</div>
 </div>
 <button id='keep-dice'>Keep Results</button>
