@@ -65,16 +65,18 @@
 		});
 
 		$("#keep-dice").click(function() {
-			var player_notation = $("#player-notation").val().replace("|", "").trim();
-			var remarks_notation = $("#remarks-notation").val().replace("|", "").trim();
 			var notations = [];
-			if (player_notation !== "") {
-				notations.push("Player");
-				notations.push(player_notation);
-			}
-			if (remarks_notation !== "") {
-				notations.push("Remarks");
-				notations.push(remarks_notation);
+			if ($("#roll-notations").is(":checked")) {
+				var player_notation = $("#player-notation").val().replace("|", "").trim();
+				var remarks_notation = $("#remarks-notation").val().replace("|", "").trim();
+				if (player_notation !== "") {
+					notations.push("Player");
+					notations.push(player_notation);
+				}
+				if (remarks_notation !== "") {
+					notations.push("Remarks");
+					notations.push(remarks_notation);
+				}
 			}
 			ajax_command('keep', notations.join("|"));
 			$("#remarks-notation").val('');
