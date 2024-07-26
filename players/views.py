@@ -441,7 +441,7 @@ def purge(request):
         notations = Notation.objects.all()[offset:limit]
         if notations:
             for notation in notations:
-                if not Room.objects.filter(uuid=notation.owner).exists():
+                if not Roll.objects.filter(uuid=notation.owner).exists():
                     notation.delete()
             offset += 10
             limit += 10
