@@ -404,47 +404,50 @@ def purge(request):
     Tally.objects.filter(date__lt=report_start).delete()
 
     # purge orphan dice
+    purging = True
     offset = 0
     limit = 10
-    purging = True
     while purging:
         dice = Die.objects.all()[offset:limit]
         if dice:
             for die in dice:
                 if not Room.objects.filter(uuid=die.owner).exists() and not Roll.objects.filter(uuid=die.owner).exists():
                     die.delete()
-            offset += 10
-            limit += 10
+                else:
+                    offset += 1
+            limit = offset + 10
         else:
             purging = False
 
     # purge orphan stickies
+    purging = True
     offset = 0
     limit = 10
-    purging = True
     while purging:
         messages = Message.objects.all()[offset:limit]
         if messages:
             for message in messages:
                 if not Room.objects.filter(uuid=message.owner).exists():
                     message.delete()
-            offset += 10
-            limit += 10
+                else:
+                    offset += 1
+            limit = offset + 10
         else:
             purging = False
 
     # purge orphan notations
+    purging = True
     offset = 0
     limit = 10
-    purging = True
     while purging:
         notations = Notation.objects.all()[offset:limit]
         if notations:
             for notation in notations:
                 if not Roll.objects.filter(uuid=notation.owner).exists():
                     notation.delete()
-            offset += 10
-            limit += 10
+                else:
+                    offset += 1
+            limit = offset + 10
         else:
             purging = False
 
