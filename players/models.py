@@ -55,7 +55,7 @@ class Tally(models.Model):
 class Notation(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     purpose = models.CharField(max_length=10)
-    text = models.CharField(max_length=200)
+    text = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(default=timezone.now)
     owner = models.UUIDField()

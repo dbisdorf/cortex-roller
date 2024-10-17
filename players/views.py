@@ -7,6 +7,7 @@ import io
 import json
 import random
 import datetime
+import logging
 
 WORDS = [
         'Adapt', 'Attic', 'Alarm',
@@ -45,6 +46,8 @@ ROLL_FETCH_LIMIT = 10
 ROOM_PURGE_PERIOD = 15
 ROLL_PURGE_PERIOD = 180
 RANDOM_REPORT_PERIOD = 14
+
+logger = logging.getLogger(__name__)
 
 # utility functions
 
@@ -404,6 +407,8 @@ def about(request):
     return render(request, 'players/about.html', context)
 
 def purge(request):
+    logger.info("Running purge")
+
     # purge old rooms
     purge_time = timezone.now() - datetime.timedelta(days=ROOM_PURGE_PERIOD)
     old_rooms = Room.objects.filter(timestamp__lt=purge_time)
@@ -412,62 +417,78 @@ def purge(request):
         Message.objects.filter(owner=old_room.uuid).delete()
         Option.objects.filter(owner=old_room.uuid).delete()
         old_room.delete()
+    logger.info("Purged {0} rooms not used since {1}".format(len(old_rooms), purge_time))
 
     # purge old rolls
     purge_time = timezone.now() - datetime.timedelta(days=ROLL_PURGE_PERIOD)
     old_rolls = Roll.objects.filter(updated__lt=purge_time)
     for old_roll in old_rolls:
         Die.objects.filter(owner=old_roll.uuid).delete()
+        Notation.objects.filter(owner=old_roll.uuid).delete()
         old_roll.delete()
+    logger.info("Purged {0} rolls not used since {1}".format(len(old_rolls), purge_time))
 
     # purge old tallies
     report_start = datetime.date.today() - datetime.timedelta(days=RANDOM_REPORT_PERIOD)
     Tally.objects.filter(date__lt=report_start).delete()
+    logger.info("Purged tallies created before {0}".format(report_start))
 
     # purge orphan dice
+    purging = True
     offset = 0
     limit = 10
-    purging = True
+    purged = 0
     while purging:
         dice = Die.objects.all()[offset:limit]
         if dice:
             for die in dice:
                 if not Room.objects.filter(uuid=die.owner).exists() and not Roll.objects.filter(uuid=die.owner).exists():
                     die.delete()
-            offset += 10
-            limit += 10
+                    purged += 1
+                else:
+                    offset += 1
+            limit = offset + 10
         else:
             purging = False
+    logger.info("Purged {0} orphan dice".format(purged))
 
     # purge orphan stickies
+    purging = True
     offset = 0
     limit = 10
-    purging = True
+    purged = 0
     while purging:
         messages = Message.objects.all()[offset:limit]
         if messages:
             for message in messages:
                 if not Room.objects.filter(uuid=message.owner).exists():
                     message.delete()
-            offset += 10
-            limit += 10
+                    purged += 1
+                else:
+                    offset += 1
+            limit = offset + 10
         else:
             purging = False
+    logger.info("Purged {0} orphan messages".format(purged))
 
     # purge orphan notations
+    purging = True
     offset = 0
     limit = 10
-    purging = True
+    purged = 0
     while purging:
         notations = Notation.objects.all()[offset:limit]
         if notations:
             for notation in notations:
-                if not Room.objects.filter(uuid=notation.owner).exists():
+                if not Roll.objects.filter(uuid=notation.owner).exists():
                     notation.delete()
-            offset += 10
-            limit += 10
+                    purged += 1
+                else:
+                    offset += 1
+            limit = offset + 10
         else:
             purging = False
+    logger.info("Purged {0} orphan notations".format(purged))
 
     response = HttpResponse('Purge complete.')
     return response
