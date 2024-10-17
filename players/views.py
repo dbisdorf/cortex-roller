@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse
 from django.utils import timezone
-from .models import Die, Message, Roll, Room, Tally, Notation
+from .models import Die, Message, Roll, Room, Tally, Notation, Option
 from django.http import JsonResponse, HttpResponse
 #from PIL import Image, ImageDraw, ImageFont
 import io
@@ -38,6 +38,8 @@ WORDS = [
 ]
 
 DICE = [4, 6, 8, 10, 12]
+
+DEFAULT_COLORS = [1, 2, 3, 4, 5]
 
 ROLL_FETCH_LIMIT = 10
 ROOM_PURGE_PERIOD = 15
@@ -259,6 +261,16 @@ def ajax(request, room_name):
     elif command == 'clearhistory':
         Roll.objects.filter(owner=room.uuid).delete()
 
+    elif command == 'setoption':
+        opt_tokens = param.split(',')
+        opt_key = 'D{:02d}COLOR'.format(opt_tokens[0])
+        try:
+            opt = Option.objects.get(owner=room.uuid, key=opt_key)
+            opt.value = opt_tokens[1]
+        except Option.DoesNotExist:
+            opt = Option(owner=room.uuid, key=opt_key, value=opt_tokens[1])
+        opt.save()
+
     elif command != 'poll':
         valid_command = False
 
@@ -275,8 +287,16 @@ def ajax(request, room_name):
         response['message_list'] = message_text_list
         response['message_update'] = latest_update(message_list)
 
+        dice_colors = {}
+        for i in range(len(DICE)):
+            dice_colors[DICE[i]] = DEFAULT_COLORS[i]
+
+        options_list = Option.objects.filter(owner=room.uuid)
+        for opt in options_list:
+            dice_colors[int(opt.key[1:3])] = int(opt.value)
+
         dice_list = Die.objects.filter(owner=room.uuid).order_by('faces')
-        dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
+        dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'color':dice_colors[d.faces], 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
         response['dice_list'] = dice_text_list
         response['dice_update'] = latest_update(dice_list)
 
@@ -390,6 +410,7 @@ def purge(request):
     for old_room in old_rooms:
         Die.objects.filter(owner=old_room.uuid).delete()
         Message.objects.filter(owner=old_room.uuid).delete()
+        Option.objects.filter(owner=old_room.uuid).delete()
         old_room.delete()
 
     # purge old rolls

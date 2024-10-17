@@ -2,7 +2,7 @@
 <head>
 <title>Cortexatron Dice Roll</title>
 {% load static %}
-<link rel='stylesheet' type='text/css' href="{% static 'players/style-104.css' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'players/style-105.css' %}" />
 </head>
 
 <body>
@@ -11,7 +11,7 @@
 
 		<div class="dice-all-centered">
 			{% for die in dice %}
-			<div class='dice-box dice-image{{ die.faces }}'>
+			<div class='dice-box dice-image{{ die.faces }}-color{{ die.color }}'>
 				<p class='dice-faces'>D{{ die.faces }}</p>
 				<p class='dice-result'>{{ die.result }}</p>
 				<p class='dice-tag-centered'>

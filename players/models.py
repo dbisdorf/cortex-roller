@@ -60,6 +60,14 @@ class Notation(models.Model):
     updated = models.DateTimeField(default=timezone.now)
     owner = models.UUIDField()
 
-    def _str__(self):
+    def __str__(self):
         return '[{0}] {1}={2}'.format(self.owner, self.purpose, self.text)
 
+class Option(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    key = models.CharField(max_length=20)
+    value = models.CharField(max_length=200)
+    owner = models.UUIDField()
+
+    def __str__(self):
+        return '[{0}] {1}={2}'.format(self.owner, self.key, self.value)
