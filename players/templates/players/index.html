@@ -4,7 +4,7 @@
 
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
-<link rel='stylesheet' type='text/css' href="{% static 'players/style-105.css' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'players/style-12.css' %}" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="{% static 'players/jquery-3.7.1.min.js' %}"></script>
 <script>
@@ -170,9 +170,17 @@
 		});
 
 		$(document).on("click", ".color-radio", function() {
-			var colors_chosen = $(".color-radio:checked").val();
+			var colors_chosen = $("input:radio.color-radio:checked");
 			// here is where we loop through colors_chosen
 			// and submit all the colors to the back end
+
+			var new_colors = [];
+			for (choice of colors_chosen) {
+				var matches = /d(\d*)-c(\d*)/.exec(choice.value);
+				new_colors.push(matches[1]);
+				new_colors.push(matches[2]);
+			}
+			ajax_command('setoption', new_colors.join(','));
 		});
 
 		$(document).ready(function() {
@@ -522,39 +530,39 @@ d4:
 <br>
 d6:
 <img class="color-sample" src="{% static 'players/d6c1.png' %}" />
-<input type="radio" class="color-radio" id="d6-c1" name ="d4-color" value="d6-c1" />
+<input type="radio" class="color-radio" id="d6-c1" name ="d6-color" value="d6-c1" />
 <img class="color-sample" src="{% static 'players/d6c2.png' %}" />
-<input type="radio" class="color-radio" id="d6-c2" name ="d4-color" value="d6-c2" />
+<input type="radio" class="color-radio" id="d6-c2" name ="d6-color" value="d6-c2" />
 <img class="color-sample" src="{% static 'players/d6c3.png' %}" />
-<input type="radio" class="color-radio" id="d6-c3" name ="d4-color" value="d6-c3" />
+<input type="radio" class="color-radio" id="d6-c3" name ="d6-color" value="d6-c3" />
 <img class="color-sample" src="{% static 'players/d6c4.png' %}" />
-<input type="radio" class="color-radio" id="d6-c4" name ="d4-color" value="d6-c4" />
+<input type="radio" class="color-radio" id="d6-c4" name ="d6-color" value="d6-c4" />
 <img class="color-sample" src="{% static 'players/d6c5.png' %}" />
-<input type="radio" class="color-radio" id="d6-c5" name ="d4-color" value="d6-c5" />
+<input type="radio" class="color-radio" id="d6-c5" name ="d6-color" value="d6-c5" />
 <img class="color-sample" src="{% static 'players/d6c6.png' %}" />
-<input type="radio" class="color-radio" id="d6-c6" name ="d4-color" value="d6-c6" />
+<input type="radio" class="color-radio" id="d6-c6" name ="d6-color" value="d6-c6" />
 <img class="color-sample" src="{% static 'players/d6c7.png' %}" />
-<input type="radio" class="color-radio" id="d6-c7" name ="d4-color" value="d6-c7" />
+<input type="radio" class="color-radio" id="d6-c7" name ="d6-color" value="d6-c7" />
 <img class="color-sample" src="{% static 'players/d6c8.png' %}" />
-<input type="radio" class="color-radio" id="d6-c8" name ="d4-color" value="d6-c8" />
+<input type="radio" class="color-radio" id="d6-c8" name ="d6-color" value="d6-c8" />
 <br>
 d8:
 <img class="color-sample" src="{% static 'players/d8c1.png' %}" />
-<input type="radio" class="color-radio" id="d8-c1" name ="d4-color" value="d8-c1" />
+<input type="radio" class="color-radio" id="d8-c1" name ="d8-color" value="d8-c1" />
 <img class="color-sample" src="{% static 'players/d8c2.png' %}" />
-<input type="radio" class="color-radio" id="d8-c2" name ="d4-color" value="d8-c2" />
+<input type="radio" class="color-radio" id="d8-c2" name ="d8-color" value="d8-c2" />
 <img class="color-sample" src="{% static 'players/d8c3.png' %}" />
-<input type="radio" class="color-radio" id="d8-c3" name ="d4-color" value="d8-c3" />
+<input type="radio" class="color-radio" id="d8-c3" name ="d8-color" value="d8-c3" />
 <img class="color-sample" src="{% static 'players/d8c4.png' %}" />
-<input type="radio" class="color-radio" id="d8-c4" name ="d4-color" value="d8-c4" />
+<input type="radio" class="color-radio" id="d8-c4" name ="d8-color" value="d8-c4" />
 <img class="color-sample" src="{% static 'players/d8c5.png' %}" />
-<input type="radio" class="color-radio" id="d8-c5" name ="d4-color" value="d8-c5" />
+<input type="radio" class="color-radio" id="d8-c5" name ="d8-color" value="d8-c5" />
 <img class="color-sample" src="{% static 'players/d8c6.png' %}" />
-<input type="radio" class="color-radio" id="d8-c6" name ="d4-color" value="d8-c6" />
+<input type="radio" class="color-radio" id="d8-c6" name ="d8-color" value="d8-c6" />
 <img class="color-sample" src="{% static 'players/d8c7.png' %}" />
-<input type="radio" class="color-radio" id="d8-c7" name ="d4-color" value="d8-c7" />
+<input type="radio" class="color-radio" id="d8-c7" name ="d8-color" value="d8-c7" />
 <img class="color-sample" src="{% static 'players/d8c8.png' %}" />
-<input type="radio" class="color-radio" id="d8-c8" name ="d4-color" value="d8-c8" />
+<input type="radio" class="color-radio" id="d8-c8" name ="d8-color" value="d8-c8" />
 <br>
 d10:
 <img class="color-sample" src="{% static 'players/d10c1.png' %}" />
@@ -576,19 +584,19 @@ d10:
 <br>
 d12:
 <img class="color-sample" src="{% static 'players/d12c1.png' %}" />
-<input type="radio" class="color-radio" id="d12-c1" name ="d4-color" value="d12-c1" />
+<input type="radio" class="color-radio" id="d12-c1" name ="d12-color" value="d12-c1" />
 <img class="color-sample" src="{% static 'players/d12c2.png' %}" />
-<input type="radio" class="color-radio" id="d12-c2" name ="d4-color" value="d12-c2" />
+<input type="radio" class="color-radio" id="d12-c2" name ="d12-color" value="d12-c2" />
 <img class="color-sample" src="{% static 'players/d12c3.png' %}" />
-<input type="radio" class="color-radio" id="d12-c3" name ="d4-color" value="d12-c3" />
+<input type="radio" class="color-radio" id="d12-c3" name ="d12-color" value="d12-c3" />
 <img class="color-sample" src="{% static 'players/d12c4.png' %}" />
-<input type="radio" class="color-radio" id="d12-c4" name ="d4-color" value="d12-c4" />
+<input type="radio" class="color-radio" id="d12-c4" name ="d12-color" value="d12-c4" />
 <img class="color-sample" src="{% static 'players/d12c5.png' %}" />
-<input type="radio" class="color-radio" id="d12-c5" name ="d4-color" value="d12-c5" />
+<input type="radio" class="color-radio" id="d12-c5" name ="d12-color" value="d12-c5" />
 <img class="color-sample" src="{% static 'players/d12c6.png' %}" />
-<input type="radio" class="color-radio" id="d12-c6" name ="d4-color" value="d12-c6" />
+<input type="radio" class="color-radio" id="d12-c6" name ="d12-color" value="d12-c6" />
 <img class="color-sample" src="{% static 'players/d12c7.png' %}" />
-<input type="radio" class="color-radio" id="d12-c7" name ="d4-color" value="d12-c7" />
+<input type="radio" class="color-radio" id="d12-c7" name ="d12-color" value="d12-c7" />
 <img class="color-sample" src="{% static 'players/d12c8.png' %}" />
 <input type="radio" class="color-radio" id="d12-c8" name ="d4-color" value="d12-c8" />
 <br>

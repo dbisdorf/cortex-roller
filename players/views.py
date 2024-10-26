@@ -266,7 +266,7 @@ def ajax(request, room_name):
 
     elif command == 'setoption':
         opt_tokens = param.split(',')
-        opt_key = 'D{:02d}COLOR'.format(opt_tokens[0])
+        opt_key = 'D{:02d}COLOR'.format(int(opt_tokens[0]))
         try:
             opt = Option.objects.get(owner=room.uuid, key=opt_key)
             opt.value = opt_tokens[1]
