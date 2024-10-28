@@ -67,6 +67,7 @@ class Option(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     key = models.CharField(max_length=20)
     value = models.CharField(max_length=200)
+    updated = models.DateTimeField(default=timezone.now)
     owner = models.UUIDField()
 
     def __str__(self):

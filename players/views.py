@@ -266,13 +266,14 @@ def ajax(request, room_name):
 
     elif command == 'setoption':
         opt_tokens = param.split(',')
-        opt_key = 'D{:02d}COLOR'.format(int(opt_tokens[0]))
-        try:
-            opt = Option.objects.get(owner=room.uuid, key=opt_key)
-            opt.value = opt_tokens[1]
-        except Option.DoesNotExist:
-            opt = Option(owner=room.uuid, key=opt_key, value=opt_tokens[1])
-        opt.save()
+        for i in range(int(len(opt_tokens) / 2)):
+            opt_key = 'D{:02d}COLOR'.format(int(opt_tokens[i * 2]))
+            try:
+                opt = Option.objects.get(owner=room.uuid, key=opt_key)
+                opt.value = opt_tokens[1]
+            except Option.DoesNotExist:
+                opt = Option(owner=room.uuid, key=opt_key, value=opt_tokens[i * 2 + 1])
+            opt.save()
 
     elif command != 'poll':
         valid_command = False
@@ -295,6 +296,8 @@ def ajax(request, room_name):
             dice_colors[DICE[i]] = DEFAULT_COLORS[i]
 
         options_list = Option.objects.filter(owner=room.uuid)
+        colors_update = latest_update(options_list)
+        logging.debug(colors_update)
         for opt in options_list:
             dice_colors[int(opt.key[1:3])] = int(opt.value)
 
