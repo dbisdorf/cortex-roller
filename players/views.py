@@ -270,7 +270,8 @@ def ajax(request, room_name):
             opt_key = 'D{:02d}COLOR'.format(int(opt_tokens[i * 2]))
             try:
                 opt = Option.objects.get(owner=room.uuid, key=opt_key)
-                opt.value = opt_tokens[1]
+                opt.value = opt_tokens[i * 2 + 1]
+                opt.updated = timezone.now()
             except Option.DoesNotExist:
                 opt = Option(owner=room.uuid, key=opt_key, value=opt_tokens[i * 2 + 1])
             opt.save()
@@ -296,15 +297,22 @@ def ajax(request, room_name):
             dice_colors[DICE[i]] = DEFAULT_COLORS[i]
 
         options_list = Option.objects.filter(owner=room.uuid)
-        colors_update = latest_update(options_list)
-        logging.debug(colors_update)
         for opt in options_list:
             dice_colors[int(opt.key[1:3])] = int(opt.value)
+        
+        response['dice_colors'] = dice_colors
+        colors_update = latest_update(options_list)
+        response['colors_update'] = colors_update
 
         dice_list = Die.objects.filter(owner=room.uuid).order_by('faces')
         dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'color':dice_colors[d.faces], 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
         response['dice_list'] = dice_text_list
-        response['dice_update'] = latest_update(dice_list)
+        dice_update = latest_update(dice_list)
+        response['dice_update'] = dice_update
+
+        if options_list:
+            if colors_update > dice_update:
+                response['dice_update'] = colors_update
 
         roll_list = Roll.objects.filter(owner=room.uuid).order_by('-created')[:ROLL_FETCH_LIMIT]
         roll_text_list = [{'uuid':r.uuid, 'text':evaluate_dice(Die.objects.filter(owner=r.uuid).order_by('faces'))+format_notations(Notation.objects.filter(owner=r.uuid).order_by('purpose'))} for r in roll_list]
