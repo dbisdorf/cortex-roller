@@ -363,20 +363,21 @@
 	function draw_color_options() {
 		$("#color-controls").empty();
 		if ($("#show-colors").is(":checked")) {
-			$("#color-controls").append("<h1>Dice Colors</h1>");
+			var color_html = "<h1>Dice Colors</h1><div class='color-box'>";
 			for (const [df, value] of Object.entries(dice_colors)) {
-				$("#color-controls").append("d" + df);
+				color_html += "<div class='color-group'><div class='color-choice'>d" + df + "</div>";
 				for (var j = 1; j < 9; j++) {
-					$("#color-controls").append("<img class='color-sample' src='{% get_static_prefix %}players/d" + df + "c" + j + ".png' />");
 					var chkd = "";
 					if (j == value) {
 						chkd = "checked";
 					}
-					$("#color-controls").append("<input type='radio' class='color-radio' id='d" + df + "-c" + j + "' name ='d" + df + "-color' value='d" + df + "-c" + j + "' " + chkd + " />"); 
-					<!-- $("#color-controls").append("<input type='radio' class='color-radio' id='d" + df + "-c" + j + "' name ='d" + df + "-color' value='d" + df + "-c" + j + "'"); -->
+					color_html += "<div class='color-choice'><img class='color-sample' src='{% get_static_prefix %}players/d" + df + "c" + j + ".png' /><input type='radio' class='color-radio' id='d" + df + "-c" + j + "' name ='d" + df + "-color' value='d" + df + "-c" + j + "' " + chkd + " /></div>";
 				}
-				$("#color-controls").append("<br>");
+				color_html += "</div>"
 			}
+			color_html += "</div>";
+
+			$("#color-controls").append(color_html);
 		}
 	}
 
@@ -535,7 +536,7 @@
 <label for="show-colors">Show dice color controls</label>
 </div>
 
-<div id="color-controls" class="bottom-box small-bottom-box color-box">
+<div id="color-controls" class="bottom-box small-bottom-box">
 <!--
 <h1>Dice Colors</h1>
 d4:

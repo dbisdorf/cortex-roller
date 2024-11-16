@@ -157,6 +157,19 @@ button {
 	width: 100%;
 }
 
+.color-box {
+	display: table;
+	width: 100%;
+}
+
+.color-group{
+	display: table-row;
+}
+
+.color-choice{
+	display: table-cell;
+}
+
 .color-sample {
 	width: 20px;
 }
