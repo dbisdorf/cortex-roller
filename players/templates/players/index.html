@@ -4,7 +4,7 @@
 
 {% load static %}
 {% get_static_prefix as STATIC_PREFIX %}
-<link rel='stylesheet' type='text/css' href="{% static 'players/style-104.css' %}" />
+<link rel='stylesheet' type='text/css' href="{% static 'players/style-12.css' %}" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="{% static 'players/jquery-3.7.1.min.js' %}"></script>
 <script>
@@ -15,6 +15,8 @@
 	var rolls_updated = "";
 	var roll_list = [];
 	var recent_roll;
+	var colors_updated = "";
+	var dice_colors = {};
 
 	(function poll(){
 		ajax_command('poll', 0);
@@ -118,6 +120,10 @@
 			toggle_notation_fields();
 		})
 
+		$("#show-colors").click(function() {
+			draw_color_options();
+		})
+
 		$(document).on("click", ".del-message", function() {
 			var message_id = $( this ).attr("id").substring(4);
 			$("#message-text").val( $("#" + message_id).text() );
@@ -165,6 +171,20 @@
 			ajax_command('deldice', checked_dice_ids());
 		});
 
+		$(document).on("click", ".color-radio", function() {
+			var colors_chosen = $("input:radio.color-radio:checked");
+			// here is where we loop through colors_chosen
+			// and submit all the colors to the back end
+
+			var new_colors = [];
+			for (choice of colors_chosen) {
+				var matches = /d(\d*)-c(\d*)/.exec(choice.value);
+				new_colors.push(matches[1]);
+				new_colors.push(matches[2]);
+			}
+			ajax_command('setoption', new_colors.join(','));
+		});
+
 		$(document).ready(function() {
     	draw_check_behavior();
 		});
@@ -190,6 +210,11 @@
 						dice_updated = json.dice_update;
 						dice_list = json.dice_list;
 						draw_dice();
+					}
+					if (Object.keys(dice_colors).length == 0 || colors_updated != json.colors_update || colors_updated != json.colors_update) {
+						colors_updated = json.colors_update;
+						dice_colors = json.dice_colors;
+						draw_color_options();
 					}
 					if (messages_updated != json.message_update || message_list.length != json.message_list.length) {
 						messages_updated = json.message_update;
@@ -264,6 +289,7 @@
 		for (var i = 0; i < dice_list.length; i++) {
 			var uuid = dice_list[i].uuid;
 			var faces = dice_list[i].faces;
+			var color = dice_list[i].color;
 			var result = dice_list[i].result;
 			var tag = dice_list[i].tag;
 			var spacer = false;
@@ -301,7 +327,7 @@
 				} else {
 					verbose_tag = "&nbsp;";
 				}
-				$('#dice-row').append("<div class='dice-box dice-image" + faces + "'><p class='dice-faces'>D" + faces + "</p><p class='dice-result'>" + result + "</p><p class='dice-tag'>" + verbose_tag + "<input type='checkbox' class='dice-check right-check' id='" + uuid + "'></p></div>");
+				$('#dice-row').append("<div class='dice-box dice-image" + faces + "-color" + color + "'><p class='dice-faces'>D" + faces + "</p><p class='dice-result'>" + result + "</p><p class='dice-tag'>" + verbose_tag + "<input type='checkbox' class='dice-check right-check' id='" + uuid + "'></p></div>");
 				if (spacer) {
 					$("#dice-row").append("<div class='dice-spacer'></div>");
 				}
@@ -331,6 +357,27 @@
 			setTimeout(draw_error, 5000);
 		} else {
 			$("#error-box").append("&nbsp;");
+		}
+	}
+
+	function draw_color_options() {
+		$("#color-controls").empty();
+		if ($("#show-colors").is(":checked")) {
+			var color_html = "<h1>Dice Colors</h1><div class='color-box'>";
+			for (const [df, value] of Object.entries(dice_colors)) {
+				color_html += "<div class='color-group'><div class='color-choice'>d" + df + "</div>";
+				for (var j = 1; j < 9; j++) {
+					var chkd = "";
+					if (j == value) {
+						chkd = "checked";
+					}
+					color_html += "<div class='color-choice'><img class='color-sample' src='{% get_static_prefix %}players/d" + df + "c" + j + ".png' /><input type='radio' class='color-radio' id='d" + df + "-c" + j + "' name ='d" + df + "-color' value='d" + df + "-c" + j + "' " + chkd + " /></div>";
+				}
+				color_html += "</div>"
+			}
+			color_html += "</div>";
+
+			$("#color-controls").append(color_html);
 		}
 	}
 
@@ -376,6 +423,14 @@
 			$("#notation-fields").css("display", "table");
 		} else {
 			$("#notation-fields").css("display", "none");
+		}
+	}
+
+	function toggle_dice_colors() {
+		if ($("#show-colors").is(":checked")) {
+			$("#color-controls").css("display", "table");
+		} else {
+			$("#color-controls").css("display", "none");
 		}
 	}
 
@@ -476,6 +531,105 @@
 <br>
 <input type="checkbox" id="roll-notations" name="roll-notations">
 <label for="roll-notations">Allow remarks for kept rolls</label>
+<br>
+<input type="checkbox" id="show-colors" name="show-colors">
+<label for="show-colors">Show dice color controls</label>
+</div>
+
+<div id="color-controls" class="bottom-box small-bottom-box">
+<!--
+<h1>Dice Colors</h1>
+d4:
+<img class="color-sample" src="{% static 'players/d4c1.png' %}" />
+<input type="radio" class="color-radio" id="d4-c1" name ="d4-color" value="d4-c1" />
+<img class="color-sample" src="{% static 'players/d4c2.png' %}" />
+<input type="radio" class="color-radio" id="d4-c2" name ="d4-color" value="d4-c2" />
+<img class="color-sample" src="{% static 'players/d4c3.png' %}" />
+<input type="radio" class="color-radio" id="d4-c3" name ="d4-color" value="d4-c3" />
+<img class="color-sample" src="{% static 'players/d4c4.png' %}" />
+<input type="radio" class="color-radio" id="d4-c4" name ="d4-color" value="d4-c4" />
+<img class="color-sample" src="{% static 'players/d4c5.png' %}" />
+<input type="radio" class="color-radio" id="d4-c5" name ="d4-color" value="d4-c5" />
+<img class="color-sample" src="{% static 'players/d4c6.png' %}" />
+<input type="radio" class="color-radio" id="d4-c6" name ="d4-color" value="d4-c6" />
+<img class="color-sample" src="{% static 'players/d4c7.png' %}" />
+<input type="radio" class="color-radio" id="d4-c7" name ="d4-color" value="d4-c7" />
+<img class="color-sample" src="{% static 'players/d4c8.png' %}" />
+<input type="radio" class="color-radio" id="d4-c8" name ="d4-color" value="d4-c8" />
+<br>
+d6:
+<img class="color-sample" src="{% static 'players/d6c1.png' %}" />
+<input type="radio" class="color-radio" id="d6-c1" name ="d6-color" value="d6-c1" />
+<img class="color-sample" src="{% static 'players/d6c2.png' %}" />
+<input type="radio" class="color-radio" id="d6-c2" name ="d6-color" value="d6-c2" />
+<img class="color-sample" src="{% static 'players/d6c3.png' %}" />
+<input type="radio" class="color-radio" id="d6-c3" name ="d6-color" value="d6-c3" />
+<img class="color-sample" src="{% static 'players/d6c4.png' %}" />
+<input type="radio" class="color-radio" id="d6-c4" name ="d6-color" value="d6-c4" />
+<img class="color-sample" src="{% static 'players/d6c5.png' %}" />
+<input type="radio" class="color-radio" id="d6-c5" name ="d6-color" value="d6-c5" />
+<img class="color-sample" src="{% static 'players/d6c6.png' %}" />
+<input type="radio" class="color-radio" id="d6-c6" name ="d6-color" value="d6-c6" />
+<img class="color-sample" src="{% static 'players/d6c7.png' %}" />
+<input type="radio" class="color-radio" id="d6-c7" name ="d6-color" value="d6-c7" />
+<img class="color-sample" src="{% static 'players/d6c8.png' %}" />
+<input type="radio" class="color-radio" id="d6-c8" name ="d6-color" value="d6-c8" />
+<br>
+d8:
+<img class="color-sample" src="{% static 'players/d8c1.png' %}" />
+<input type="radio" class="color-radio" id="d8-c1" name ="d8-color" value="d8-c1" />
+<img class="color-sample" src="{% static 'players/d8c2.png' %}" />
+<input type="radio" class="color-radio" id="d8-c2" name ="d8-color" value="d8-c2" />
+<img class="color-sample" src="{% static 'players/d8c3.png' %}" />
+<input type="radio" class="color-radio" id="d8-c3" name ="d8-color" value="d8-c3" />
+<img class="color-sample" src="{% static 'players/d8c4.png' %}" />
+<input type="radio" class="color-radio" id="d8-c4" name ="d8-color" value="d8-c4" />
+<img class="color-sample" src="{% static 'players/d8c5.png' %}" />
+<input type="radio" class="color-radio" id="d8-c5" name ="d8-color" value="d8-c5" />
+<img class="color-sample" src="{% static 'players/d8c6.png' %}" />
+<input type="radio" class="color-radio" id="d8-c6" name ="d8-color" value="d8-c6" />
+<img class="color-sample" src="{% static 'players/d8c7.png' %}" />
+<input type="radio" class="color-radio" id="d8-c7" name ="d8-color" value="d8-c7" />
+<img class="color-sample" src="{% static 'players/d8c8.png' %}" />
+<input type="radio" class="color-radio" id="d8-c8" name ="d8-color" value="d8-c8" />
+<br>
+d10:
+<img class="color-sample" src="{% static 'players/d10c1.png' %}" />
+<input type="radio" class="color-radio" id="d10-c1" name ="d10-color" value="d10-c1" />
+<img class="color-sample" src="{% static 'players/d10c2.png' %}" />
+<input type="radio" class="color-radio" id="d10-c2" name ="d10-color" value="d10-c2" />
+<img class="color-sample" src="{% static 'players/d10c3.png' %}" />
+<input type="radio" class="color-radio" id="d10-c3" name ="d10-color" value="d10-c3" />
+<img class="color-sample" src="{% static 'players/d10c4.png' %}" />
+<input type="radio" class="color-radio" id="d10-c4" name ="d10-color" value="d10-c4" />
+<img class="color-sample" src="{% static 'players/d10c5.png' %}" />
+<input type="radio" class="color-radio" id="d10-c5" name ="d10-color" value="d10-c5" />
+<img class="color-sample" src="{% static 'players/d10c6.png' %}" />
+<input type="radio" class="color-radio" id="d10-c6" name ="d10-color" value="d10-c6" />
+<img class="color-sample" src="{% static 'players/d10c7.png' %}" />
+<input type="radio" class="color-radio" id="d10-c7" name ="d10-color" value="d10-c7" />
+<img class="color-sample" src="{% static 'players/d10c8.png' %}" />
+<input type="radio" class="color-radio" id="d10-c8" name ="d10-color" value="d10-c8" />
+<br>
+d12:
+<img class="color-sample" src="{% static 'players/d12c1.png' %}" />
+<input type="radio" class="color-radio" id="d12-c1" name ="d12-color" value="d12-c1" />
+<img class="color-sample" src="{% static 'players/d12c2.png' %}" />
+<input type="radio" class="color-radio" id="d12-c2" name ="d12-color" value="d12-c2" />
+<img class="color-sample" src="{% static 'players/d12c3.png' %}" />
+<input type="radio" class="color-radio" id="d12-c3" name ="d12-color" value="d12-c3" />
+<img class="color-sample" src="{% static 'players/d12c4.png' %}" />
+<input type="radio" class="color-radio" id="d12-c4" name ="d12-color" value="d12-c4" />
+<img class="color-sample" src="{% static 'players/d12c5.png' %}" />
+<input type="radio" class="color-radio" id="d12-c5" name ="d12-color" value="d12-c5" />
+<img class="color-sample" src="{% static 'players/d12c6.png' %}" />
+<input type="radio" class="color-radio" id="d12-c6" name ="d12-color" value="d12-c6" />
+<img class="color-sample" src="{% static 'players/d12c7.png' %}" />
+<input type="radio" class="color-radio" id="d12-c7" name ="d12-color" value="d12-c7" />
+<img class="color-sample" src="{% static 'players/d12c8.png' %}" />
+<input type="radio" class="color-radio" id="d12-c8" name ="d4-color" value="d12-c8" />
+<br>
+-->
 </div>
 
 </div>

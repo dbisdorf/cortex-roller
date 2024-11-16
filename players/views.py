@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse
 from django.utils import timezone
-from .models import Die, Message, Roll, Room, Tally, Notation
+from .models import Die, Message, Roll, Room, Tally, Notation, Option
 from django.http import JsonResponse, HttpResponse
 #from PIL import Image, ImageDraw, ImageFont
 import io
@@ -39,6 +39,8 @@ WORDS = [
 ]
 
 DICE = [4, 6, 8, 10, 12]
+
+DEFAULT_COLORS = [1, 2, 3, 4, 5]
 
 ROLL_FETCH_LIMIT = 10
 ROOM_PURGE_PERIOD = 15
@@ -262,6 +264,18 @@ def ajax(request, room_name):
     elif command == 'clearhistory':
         Roll.objects.filter(owner=room.uuid).delete()
 
+    elif command == 'setoption':
+        opt_tokens = param.split(',')
+        for i in range(int(len(opt_tokens) / 2)):
+            opt_key = 'D{:02d}COLOR'.format(int(opt_tokens[i * 2]))
+            try:
+                opt = Option.objects.get(owner=room.uuid, key=opt_key)
+                opt.value = opt_tokens[i * 2 + 1]
+                opt.updated = timezone.now()
+            except Option.DoesNotExist:
+                opt = Option(owner=room.uuid, key=opt_key, value=opt_tokens[i * 2 + 1])
+            opt.save()
+
     elif command != 'poll':
         valid_command = False
 
@@ -278,10 +292,27 @@ def ajax(request, room_name):
         response['message_list'] = message_text_list
         response['message_update'] = latest_update(message_list)
 
+        dice_colors = {}
+        for i in range(len(DICE)):
+            dice_colors[DICE[i]] = DEFAULT_COLORS[i]
+
+        options_list = Option.objects.filter(owner=room.uuid)
+        for opt in options_list:
+            dice_colors[int(opt.key[1:3])] = int(opt.value)
+        
+        response['dice_colors'] = dice_colors
+        colors_update = latest_update(options_list)
+        response['colors_update'] = colors_update
+
         dice_list = Die.objects.filter(owner=room.uuid).order_by('faces')
-        dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
+        dice_text_list = [{'uuid':d.uuid, 'faces':d.faces, 'result':d.result, 'color':dice_colors[d.faces], 'tag':d.tag, 'timestamp':d.created} for d in dice_list]
         response['dice_list'] = dice_text_list
-        response['dice_update'] = latest_update(dice_list)
+        dice_update = latest_update(dice_list)
+        response['dice_update'] = dice_update
+
+        if options_list:
+            if colors_update > dice_update:
+                response['dice_update'] = colors_update
 
         roll_list = Roll.objects.filter(owner=room.uuid).order_by('-created')[:ROLL_FETCH_LIMIT]
         roll_text_list = [{'uuid':r.uuid, 'text':evaluate_dice(Die.objects.filter(owner=r.uuid).order_by('faces'))+format_notations(Notation.objects.filter(owner=r.uuid).order_by('purpose'))} for r in roll_list]
@@ -395,6 +426,7 @@ def purge(request):
     for old_room in old_rooms:
         Die.objects.filter(owner=old_room.uuid).delete()
         Message.objects.filter(owner=old_room.uuid).delete()
+        Option.objects.filter(owner=old_room.uuid).delete()
         old_room.delete()
     logger.info("Purged {0} rooms not used since {1}".format(len(old_rooms), purge_time))
 
