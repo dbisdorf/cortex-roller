@@ -18,7 +18,7 @@ from django.urls import include, path
 from django.http import HttpResponseRedirect
 
 urlpatterns = [
-    path('', lambda r: HttpResponseRedirect('/cortex/players/')),
+    path('', lambda r: HttpResponseRedirect('/cortexdev/players/')),
     path('players/', include('players.urls')),
     path('admin/', admin.site.urls),
 ]
