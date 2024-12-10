@@ -101,7 +101,7 @@ def format_notations(notation_list):
 
 def latest_update(record_list):
     if not record_list:
-        return ''
+        return datetime.datetime.min
     latest_record = max(record_list, key=lambda r: r.updated)
     return latest_record.updated
 
