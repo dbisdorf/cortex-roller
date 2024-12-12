@@ -332,9 +332,19 @@ def rolls(request, roll_id):
     except Roll.DoesNotExist:
         context = {'timestamp': 'not found', 'overall': 'There is no valid dice roll information at this address.', 'dice': None}
     if not context:
+
+        dice_colors = {}
+        for i in range(len(DICE)):
+            dice_colors[DICE[i]] = DEFAULT_COLORS[i]
+
+        options_list = Option.objects.filter(owner=room.uuid)
+        for opt in options_list:
+            dice_colors[int(opt.key[1:3])] = int(opt.value)
+
         dice = Die.objects.filter(owner=roll_id).order_by('-tag', 'faces')
+        colored_dice_list = [{'faces':d.faces, 'result':d.result, 'color':dice_colors[d.faces], 'tag':d.tag} for d in dice_list]
         notations = Notation.objects.filter(owner=roll_id).order_by('purpose')
-        context = {'timestamp': roll.updated, 'overall': evaluate_dice(dice), 'dice':dice, 'notations': notations}
+        context = {'timestamp': roll.updated, 'overall': evaluate_dice(dice), 'dice':colored_dice_list, 'notations': notations}
 
     '''
     image = Image.new('RGB', (640, 160), (255, 255, 255))
